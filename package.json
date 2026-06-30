@@ -1,0 +1,20 @@
+{
+  "name": "black-sentinel-nexus-free",
+  "version": "1.0.0-free",
+  "description": "BlackSentinel Nexus Free - New Generation SIEM (Free Edition)",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"pnpm --filter @bsn/api dev\" \"pnpm --filter @bsn/web dev\"",
+    "build": "turbo build",
+    "start": "pnpm --filter @bsn/api start & pnpm --filter @bsn/web start",
+    "lint": "turbo lint",
+    "typecheck": "turbo typecheck"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "turbo": "^1.12.4"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
