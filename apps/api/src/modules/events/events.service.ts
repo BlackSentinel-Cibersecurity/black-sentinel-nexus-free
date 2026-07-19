@@ -147,7 +147,7 @@ export class EventsService {
     }
 
     if (query.search) {
-      qb.andWhere('(e.message ILIKE :search OR e.eventType ILIKE :search)', { search: `%${query.search}%` });
+      qb.andWhere('(LOWER(e.message) LIKE LOWER(:search) OR LOWER(e.eventType) LIKE LOWER(:search))', { search: `%${query.search}%` });
     }
 
     const page = query.page || 1;
@@ -212,6 +212,20 @@ export class EventsService {
 
   async getTimeline(minutes = 60): Promise<any[]> {
     const start = new Date(Date.now() - minutes * 60 * 1000);
+    const dbType = this.eventRepo.manager.connection.options.type;
+
+    if (dbType === 'sqlite' || dbType === 'better-sqlite3') {
+      return this.eventRepo
+        .createQueryBuilder('e')
+        .select("strftime('%Y-%m-%dT%H:%M:00', e.timestamp)", 'time')
+        .addSelect('COUNT(*)', 'count')
+        .addSelect('e.severity', 'severity')
+        .where('e.timestamp >= :start', { start })
+        .groupBy("strftime('%Y-%m-%dT%H:%M:00', e.timestamp), e.severity")
+        .orderBy("strftime('%Y-%m-%dT%H:%M:00', e.timestamp)", 'ASC')
+        .getRawMany();
+    }
+
     return this.eventRepo
       .createQueryBuilder('e')
       .select("date_trunc('minute', e.timestamp)", 'time')

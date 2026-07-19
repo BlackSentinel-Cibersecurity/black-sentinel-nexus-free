@@ -8,7 +8,25 @@ import { GlassPanel } from '@bsn/ui';
 import { PageLoader } from '@/components/PageLoader';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { Header } from '@/components/layout/Header';
+import { api } from '@/lib/api';
 import { useI18n } from '@/lib/i18n';
+
+interface TwinNode {
+  id: string;
+  type: string;
+  label: string;
+  status: 'healthy' | 'warning' | 'critical' | 'offline';
+  riskLevel: 'low' | 'medium' | 'high' | 'critical' | 'minimal';
+  x: number;
+  y: number;
+  z: number;
+}
+
+interface TwinEdge {
+  source: string;
+  target: string;
+  status: 'active' | 'compromised';
+}
 
 function DigitalTwinLoader() {
   const { t } = useI18n();
@@ -30,41 +48,37 @@ const DigitalTwin = dynamic(
   }
 );
 
-const demoNodes = [
-  { id: '1', type: 'Firewall', label: 'FW-NORTH', status: 'healthy' as const, riskLevel: 'low' as const, x: -3, y: 1, z: 0 },
-  { id: '2', type: 'Server', label: 'WEB-PROD-01', status: 'critical' as const, riskLevel: 'critical' as const, x: 0, y: 2, z: -1 },
-  { id: '3', type: 'Database', label: 'DB-PRIMARY', status: 'warning' as const, riskLevel: 'high' as const, x: 2, y: 1, z: 1 },
-  { id: '4', type: 'Server', label: 'API-GW-01', status: 'healthy' as const, riskLevel: 'medium' as const, x: -1, y: 0, z: 2 },
-  { id: '5', type: 'Cloud', label: 'Azure-VNet', status: 'healthy' as const, riskLevel: 'low' as const, x: 3, y: 0, z: -2 },
-  { id: '6', type: 'Endpoint', label: 'WS-FINANCE-01', status: 'warning' as const, riskLevel: 'medium' as const, x: -2, y: -1, z: -2 },
-  { id: '7', type: 'Container', label: 'K8S-Cluster', status: 'healthy' as const, riskLevel: 'low' as const, x: 1, y: -1, z: 0 },
-  { id: '8', type: 'Server', label: 'AD-DC-01', status: 'healthy' as const, riskLevel: 'high' as const, x: 0, y: 3, z: 1 },
-];
-
-const demoEdges = [
-  { source: '1', target: '2', status: 'active' as const },
-  { source: '1', target: '4', status: 'active' as const },
-  { source: '2', target: '3', status: 'active' as const },
-  { source: '4', target: '3', status: 'active' as const },
-  { source: '4', target: '5', status: 'active' as const },
-  { source: '6', target: '2', status: 'compromised' as const },
-  { source: '7', target: '3', status: 'active' as const },
-  { source: '8', target: '2', status: 'active' as const },
-];
-
 export default function DigitalTwinPage() {
   const [mounted, setMounted] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [nodes, setNodes] = useState<TwinNode[]>([]);
+  const [edges, setEdges] = useState<TwinEdge[]>([]);
+  const [loading, setLoading] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
   const { t } = useI18n();
 
-  useEffect(() => { setMounted(true); }, []);
-
-  const handleSync = useCallback(() => {
-    setSyncing(true);
-    setTimeout(() => setSyncing(false), 2000);
+  const fetchGraph = useCallback(async () => {
+    try {
+      setLoading(true);
+      const data = await api.digitalTwin.graph();
+      setNodes(data.nodes || []);
+      setEdges(data.edges || []);
+    } catch {
+      setNodes([]);
+      setEdges([]);
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => { setMounted(true); fetchGraph(); }, [fetchGraph]);
+
+  const handleSync = useCallback(async () => {
+    setSyncing(true);
+    await fetchGraph();
+    setTimeout(() => setSyncing(false), 1000);
+  }, [fetchGraph]);
 
   const handleFullscreen = useCallback(() => {
     if (!document.fullscreenElement) {
@@ -75,6 +89,10 @@ export default function DigitalTwinPage() {
       setIsFullscreen(false);
     }
   }, []);
+
+  const healthyCount = nodes.filter(n => n.status === 'healthy').length;
+  const warningCount = nodes.filter(n => n.status === 'warning').length;
+  const criticalCount = nodes.filter(n => n.status === 'critical').length;
 
   if (!mounted) return <PageLoader />;
 
@@ -102,14 +120,18 @@ export default function DigitalTwinPage() {
           </motion.div>
 
           <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.6, delay: 0.2 }}>
-            <DigitalTwin nodes={demoNodes} edges={demoEdges} className="h-[600px]" />
+            {loading ? (
+              <DigitalTwinLoader />
+            ) : (
+              <DigitalTwin nodes={nodes} edges={edges} className="h-[600px]" />
+            )}
           </motion.div>
 
           <motion.div className="grid grid-cols-4 gap-4" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.4 }}>
             <GlassPanel padding="md">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-lg bg-[#FF6B00]/20 flex items-center justify-center">
-                  <span className="text-lg font-bold text-[#FF6B00]">6</span>
+                  <span className="text-lg font-bold text-[#FF6B00]">{healthyCount}</span>
                 </div>
                 <div>
                   <p className="text-xs text-gray-500">{t('digitalTwin.healthy')}</p>
@@ -120,7 +142,7 @@ export default function DigitalTwinPage() {
             <GlassPanel padding="md">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-lg bg-[#FF6B00]/15 flex items-center justify-center">
-                  <span className="text-lg font-bold text-[#FF6B00]/80">2</span>
+                  <span className="text-lg font-bold text-[#FF6B00]/80">{warningCount}</span>
                 </div>
                 <div>
                   <p className="text-xs text-gray-500">{t('digitalTwin.warning')}</p>
@@ -131,7 +153,7 @@ export default function DigitalTwinPage() {
             <GlassPanel padding="md">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-lg bg-[#FF6B00]/25 flex items-center justify-center">
-                  <span className="text-lg font-bold text-[#FF6B00]">1</span>
+                  <span className="text-lg font-bold text-[#FF6B00]">{criticalCount}</span>
                 </div>
                 <div>
                   <p className="text-xs text-gray-500">{t('digitalTwin.criticalNodes')}</p>
@@ -142,7 +164,7 @@ export default function DigitalTwinPage() {
             <GlassPanel padding="md">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-lg bg-gray-600/20 flex items-center justify-center">
-                  <span className="text-lg font-bold text-gray-400">8</span>
+                  <span className="text-lg font-bold text-gray-400">{nodes.length}</span>
                 </div>
                 <div>
                   <p className="text-xs text-gray-500">{t('digitalTwin.totalNodes')}</p>

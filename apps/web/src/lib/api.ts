@@ -114,6 +114,13 @@ export const api = {
     query: (query: string) => fetchAPI('/api/v1/ai/query', { method: 'POST', body: JSON.stringify({ query }) }),
     generateRule: (desc: string) => fetchAPI('/api/v1/ai/generate-rule', { method: 'POST', body: JSON.stringify({ description: desc }) }),
   },
+  correlation: {
+    alerts: (params?: { status?: string; severity?: string; limit?: number }) => {
+      const qs = params ? '?' + new URLSearchParams(params as any).toString() : '';
+      return fetchAPI(`/api/v1/correlation/alerts${qs}`);
+    },
+    rules: () => fetchAPI('/api/v1/correlation/rules'),
+  },
   reports: {
     list: () => fetchAPI('/api/v1/reports'),
     templates: () => fetchAPI('/api/v1/reports/templates'),

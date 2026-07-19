@@ -14,11 +14,22 @@ echo "  - EN/ES languages only"
 echo "  - No PDF export"
 echo ""
 
-# Kill existing processes
+# Check if .env exists, copy from .env.example if not
+if [ ! -f apps/api/.env ]; then
+    echo "Creating .env from .env.example..."
+    cp .env.example apps/api/.env
+fi
+
+# Kill existing processes on ports
 echo "Stopping existing processes..."
-kill $(lsof -ti:3001) 2>/dev/null || true
-kill $(lsof -ti:3000) 2>/dev/null || true
-sleep 1
+if lsof -ti:3001 &> /dev/null; then
+    kill $(lsof -ti:3001) 2>/dev/null || true
+    sleep 1
+fi
+if lsof -ti:3000 &> /dev/null; then
+    kill $(lsof -ti:3000) 2>/dev/null || true
+    sleep 1
+fi
 
 # Start API
 echo "Starting API on port 3001..."
@@ -42,6 +53,8 @@ echo "  Docs:   http://localhost:3001/docs"
 echo "  Health: http://localhost:3001/api/v1/health"
 echo ""
 echo "  Login:  admin@blacksentinel.io / Admin@123"
+echo ""
+echo "  Press Ctrl+C to stop"
 echo ""
 
 # Wait for processes

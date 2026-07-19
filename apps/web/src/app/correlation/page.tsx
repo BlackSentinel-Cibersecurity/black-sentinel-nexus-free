@@ -376,25 +376,26 @@ export default function CorrelationPage() {
   const fetchAlerts = async () => {
     try {
       setLoading(true);
-      const data = await api.events.stats().catch(() => null);
-      // Generate demo correlation alerts from event data
-      const demoAlerts: CorrelationAlert[] = [
-        { id: '1', ruleName: 'Brute Force Detection', severity: 'critical', sourceIp: '192.168.1.105', message: '5+ failed login attempts from same IP in 5 minutes', timestamp: new Date().toISOString(), eventsCount: 12, status: 'open' },
-        { id: '2', ruleName: 'Port Scan Detected', severity: 'high', sourceIp: '10.0.0.42', message: '15 connections to different ports from single source', timestamp: new Date(Date.now() - 300000).toISOString(), eventsCount: 15, status: 'open' },
-        { id: '3', ruleName: 'Data Exfiltration Attempt', severity: 'critical', sourceIp: '172.16.0.88', message: 'Unusual outbound data transfer pattern detected', timestamp: new Date(Date.now() - 600000).toISOString(), eventsCount: 8, status: 'investigating' },
-        { id: '4', ruleName: 'Privilege Escalation', severity: 'critical', sourceIp: '192.168.1.200', message: 'Admin privilege escalation from standard user account', timestamp: new Date(Date.now() - 900000).toISOString(), eventsCount: 3, status: 'open' },
-        { id: '5', ruleName: 'Malware Activity', severity: 'critical', sourceIp: '10.0.0.15', message: 'Known malware signature detected in network traffic', timestamp: new Date(Date.now() - 1200000).toISOString(), eventsCount: 6, status: 'contained' },
-        { id: '6', ruleName: 'Anomalous Login Pattern', severity: 'high', sourceIp: '203.0.113.50', message: 'Login from unusual geographic location', timestamp: new Date(Date.now() - 1500000).toISOString(), eventsCount: 2, status: 'open' },
-        { id: '7', ruleName: 'Lateral Movement', severity: 'high', sourceIp: '192.168.1.110', message: 'Sequential access to multiple internal servers', timestamp: new Date(Date.now() - 1800000).toISOString(), eventsCount: 4, status: 'investigating' },
-        { id: '8', ruleName: 'DNS Tunneling', severity: 'medium', sourceIp: '10.0.0.77', message: 'Suspicious DNS query patterns detected', timestamp: new Date(Date.now() - 2100000).toISOString(), eventsCount: 20, status: 'open' },
-      ];
-      setAlerts(demoAlerts);
+      const data = await api.correlation.alerts({ status: 'open', limit: 50 }).catch(() => []);
+
+      const mappedAlerts: CorrelationAlert[] = (Array.isArray(data) ? data : []).map((alert: any) => ({
+        id: alert.id,
+        ruleName: alert.ruleName || alert.title,
+        severity: alert.severity,
+        sourceIp: alert.sourceIp || 'Unknown',
+        message: alert.description || alert.title,
+        timestamp: alert.createdAt || alert.firstSeenAt,
+        eventsCount: alert.occurrenceCount || 1,
+        status: alert.status,
+      }));
+
+      setAlerts(mappedAlerts);
       setStats({
-        total: demoAlerts.length,
-        critical: demoAlerts.filter(a => a.severity === 'critical').length,
-        high: demoAlerts.filter(a => a.severity === 'high').length,
-        medium: demoAlerts.filter(a => a.severity === 'medium').length,
-        low: demoAlerts.filter(a => a.severity === 'low').length,
+        total: mappedAlerts.length,
+        critical: mappedAlerts.filter(a => a.severity === 'critical').length,
+        high: mappedAlerts.filter(a => a.severity === 'high').length,
+        medium: mappedAlerts.filter(a => a.severity === 'medium').length,
+        low: mappedAlerts.filter(a => a.severity === 'low').length,
       });
     } catch { } finally { setLoading(false); }
   };

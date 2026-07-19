@@ -3,7 +3,12 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Notification } from '../../database/entities/audit-log.entity';
 import { EventsGateway } from '../../websocket/events.gateway';
-import * as nodemailer from 'nodemailer';
+let nodemailer: any;
+try {
+  nodemailer = require('nodemailer');
+} catch {
+  nodemailer = null;
+}
 
 export interface CreateNotificationDto {
   userId: string;
@@ -24,7 +29,7 @@ interface DispatchConfig {
 @Injectable()
 export class NotificationService {
   private readonly logger = new Logger(NotificationService.name);
-  private emailTransporter: nodemailer.Transporter | null = null;
+  private emailTransporter: any = null;
 
   constructor(
     @InjectRepository(Notification) private notifRepo: Repository<Notification>,

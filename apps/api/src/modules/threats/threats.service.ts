@@ -52,7 +52,7 @@ export class ThreatsService {
   async searchIndicators(query: string) {
     return this.iocRepo
       .createQueryBuilder('i')
-      .where('i.value ILIKE :q OR i.name ILIKE :q OR i.tags ILIKE :q', { q: `%${query}%` })
+      .where('LOWER(i.value) LIKE LOWER(:q) OR LOWER(i.name) LIKE LOWER(:q) OR LOWER(i.tags) LIKE LOWER(:q)', { q: `%${query}%` })
       .orderBy('i.lastSeenAt', 'DESC')
       .limit(50)
       .getMany();

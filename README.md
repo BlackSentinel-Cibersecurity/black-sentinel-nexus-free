@@ -1,10 +1,65 @@
 # BlackSentinel Nexus FREE
 
-## New Generation SIEM - Free Edition
+**New Generation Security Operations Platform (SIEM) - Free Edition**
 
-BlackSentinel Nexus is a next-generation Security Operations Platform (SIEM) with AI-powered correlation, real-time monitoring, and automated response capabilities.
+[![License: MIT](https://img.shields.io/badge/License-MIT-orange.svg)](LICENSE)
+[![Node.js](https://img.shields.io/badge/Node.js-%3E%3D18-green.svg)](https://nodejs.org/)
+[![pnpm](https://img.shields.io/badge/pnpm-%3E%3D9.0.0-blue.svg)](https://pnpm.io/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.5-blue.svg)](https://www.typescriptlang.org/)
 
-**This is the FREE edition** with limited features. For full capabilities, upgrade to Enterprise.
+BlackSentinel Nexus is a next-generation Security Operations Platform with AI-powered correlation, real-time monitoring, and automated response capabilities.
+
+**This is the FREE edition** with limited features. For full capabilities, see [Enterprise Features](#enterprise-features).
+
+---
+
+## Quick Start
+
+### Option 1: Docker (Recommended)
+
+```bash
+git clone https://github.com/your-org/black-sentinel-nexus-free.git
+cd black-sentinel-nexus-free
+docker-compose up -d
+```
+
+### Option 2: Local Development
+
+```bash
+# Prerequisites
+# - Node.js >= 18
+# - pnpm >= 9.0.0
+
+git clone https://github.com/your-org/black-sentinel-nexus-free.git
+cd black-sentinel-nexus-free
+
+# Install dependencies
+pnpm install
+
+# Build shared packages
+pnpm --filter @bsn/types build
+pnpm --filter @bsn/ui build
+
+# Copy environment variables
+cp .env.example apps/api/.env
+
+# Start development servers
+pnpm dev
+```
+
+### Access the Application
+
+| Service | URL |
+|---------|-----|
+| Web UI | http://localhost:3000 |
+| API | http://localhost:3001 |
+| API Docs | http://localhost:3001/docs |
+| Health Check | http://localhost:3001/api/v1/health |
+
+### Default Credentials
+
+- **Email**: admin@blacksentinel.io
+- **Password**: Admin@123
 
 ---
 
@@ -24,47 +79,7 @@ BlackSentinel Nexus is a next-generation Security Operations Platform (SIEM) wit
 
 ---
 
-## Quick Start
-
-### Prerequisites
-
-- Node.js >= 18
-- pnpm >= 9.0.0
-
-### Installation
-
-```bash
-# Clone or copy this directory to your target location
-cd black-sentinel-nexus-free
-
-# Install dependencies
-pnpm install
-
-# Build the project
-./scripts/build.sh
-```
-
-### Running
-
-```bash
-# Start the application
-./scripts/start.sh
-```
-
-The application will be available at:
-- **Web UI**: http://localhost:3000
-- **API**: http://localhost:3001
-- **API Docs**: http://localhost:3001/docs
-- **Health Check**: http://localhost:3001/api/v1/health
-
-### Default Credentials
-
-- **Email**: admin@blacksentinel.io
-- **Password**: Admin@123
-
----
-
-## Features Included
+## Features
 
 ### Core SIEM
 - Real-time security event monitoring
@@ -86,22 +101,15 @@ The application will be available at:
 
 ### Integration
 - 10 connector templates:
-  - AWS CloudTrail
-  - CrowdStrike Falcon
-  - Palo Alto Networks
-  - Splunk
-  - Okta
-  - Jira
-  - Slack
-  - Microsoft Teams
-  - Syslog TCP/UDP
-  - VirusTotal
+  - AWS CloudTrail, CrowdStrike Falcon, Palo Alto Networks
+  - Splunk, Okta, Jira, Slack, Microsoft Teams
+  - Syslog TCP/UDP, VirusTotal
 
 ### Reporting
 - Executive security reports
 - Technical security reports
 - Incident investigation reports
-- JSON format (no PDF export)
+- JSON format (no PDF export in FREE edition)
 
 ### Digital Twin
 - 4-node infrastructure visualization
@@ -115,12 +123,13 @@ The application will be available at:
 ```
 black-sentinel-nexus-free/
   apps/
-    api/          # NestJS backend
-    web/          # Next.js frontend
+    api/              # NestJS backend
+    web/              # Next.js frontend
   packages/
-    ui/           # Shared UI components
-  scripts/        # Build and run scripts
-  images/         # Logo and assets
+    types/            # Shared TypeScript types
+    ui/               # Shared React components
+  scripts/            # Build and run scripts
+  docker-compose.yml  # Docker deployment
 ```
 
 ---
@@ -155,33 +164,25 @@ black-sentinel-nexus-free/
 
 ## Environment Variables
 
-Create a `.env` file:
+Copy `.env.example` to `apps/api/.env` and configure:
 
-```env
-# Server
-PORT=3001
-NODE_ENV=development
-
-# Database
-DB_TYPE=sqlite
-DB_DATABASE=black_sentinel.db
-
-# Authentication
-JWT_SECRET=your-secret-key-here
-JWT_EXPIRY=24h
-
-# CORS
-CORS_ORIGIN=http://localhost:3000
-
-# AI (Optional)
-AI_API_KEY=your-openai-api-key
-```
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `API_PORT` | API server port | `3001` |
+| `DATABASE_TYPE` | Database type (`sqlite` or `postgres`) | `sqlite` |
+| `DATABASE_PATH` | SQLite database path | `./black_sentinel.db` |
+| `JWT_SECRET` | JWT signing secret | (required) |
+| `JWT_EXPIRES_IN` | JWT token expiry | `24h` |
+| `CORS_ORIGIN` | Allowed CORS origin | `http://localhost:3000` |
+| `AI_API_KEY` | OpenAI API key (optional) | - |
+| `SMTP_HOST` | SMTP server for notifications (optional) | - |
 
 ---
 
-## Upgrade to Enterprise
+## Enterprise Features
 
-For full capabilities, contact sales@blacksentinel.io or visit:
+For full capabilities, contact sales@blacksentinel.io:
+
 - Unlimited users
 - 64 connector templates
 - 5+ correlation rules
@@ -193,9 +194,12 @@ For full capabilities, contact sales@blacksentinel.io or visit:
 
 ---
 
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup and guidelines.
+
 ## License
 
-Copyright (c) 2024 BlackSentinel. All rights reserved.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-This software is proprietary and confidential.
-Unauthorized copying, modification, distribution, or use of this software is strictly prohibited.
+Copyright (c) 2026 BlackSentinel
