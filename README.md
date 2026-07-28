@@ -6,46 +6,75 @@
 [![Node.js](https://img.shields.io/badge/Node.js-%3E%3D18-green.svg)](https://nodejs.org/)
 [![pnpm](https://img.shields.io/badge/pnpm-%3E%3D9.0.0-blue.svg)](https://pnpm.io/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.5-blue.svg)](https://www.typescriptlang.org/)
+[![Linux](https://img.shields.io/badge/Linux-compatible-brightgreen.svg)]()
+[![macOS](https://img.shields.io/badge/macOS-compatible-brightgreen.svg)]()
+[![Windows](https://img.shields.io/badge/Windows-compatible-brightgreen.svg)]()
 
 BlackSentinel Nexus is a next-generation Security Operations Platform with AI-powered correlation, real-time monitoring, and automated response capabilities.
 
 **This is the FREE edition** with limited features. For full capabilities, see [Enterprise Features](#enterprise-features).
 
+**Works on:** Linux (Ubuntu, Debian, CentOS, Fedora, Arch, etc.) | macOS | Windows
+
 ---
 
 ## Quick Start
 
+### Prerequisites
+
+- **Node.js** >= 18 ([Download](https://nodejs.org/))
+- **pnpm** >= 9.0.0 (`npm install -g pnpm`)
+
 ### Option 1: Docker (Recommended)
 
+Works on all platforms with Docker installed.
+
 ```bash
-git clone https://github.com/your-org/black-sentinel-nexus-free.git
+git clone https://github.com/BlackSentinel-Cibersecurity/black-sentinel-nexus-free.git
 cd black-sentinel-nexus-free
 docker-compose up -d
 ```
 
-### Option 2: Local Development
+### Option 2: One Command Setup
 
 ```bash
-# Prerequisites
-# - Node.js >= 18
-# - pnpm >= 9.0.0
+git clone https://github.com/BlackSentinel-Cibersecurity/black-sentinel-nexus-free.git
+cd black-sentinel-nexus-free
+pnpm install
+pnpm build
+pnpm start
+```
 
-git clone https://github.com/your-org/black-sentinel-nexus-free.git
+### Option 3: Step by Step
+
+```bash
+git clone https://github.com/BlackSentinel-Cibersecurity/black-sentinel-nexus-free.git
 cd black-sentinel-nexus-free
 
 # Install dependencies
 pnpm install
 
-# Build shared packages
-pnpm --filter @bsn/types build
-pnpm --filter @bsn/ui build
+# Build all packages
+pnpm build
 
-# Copy environment variables
+# Copy environment variables (auto-created on first start if missing)
 cp .env.example apps/api/.env
 
 # Start development servers
 pnpm dev
 ```
+
+### Available Scripts
+
+| Command | Description | Platform |
+|---------|-------------|----------|
+| `pnpm dev` | Start in development mode | All |
+| `pnpm build` | Build all packages and apps | All |
+| `pnpm start` | Start in production mode | All |
+| `pnpm stop` | Stop all running servers | All |
+| `pnpm reset-db` | Reset database to fresh state | All |
+| `pnpm lint` | Run linting | All |
+| `pnpm typecheck` | Run type checking | All |
 
 ### Access the Application
 
@@ -60,6 +89,53 @@ pnpm dev
 
 - **Email**: admin@blacksentinel.io
 - **Password**: Admin@123
+
+---
+
+## Platform-Specific Notes
+
+### Linux (Ubuntu, Debian, CentOS, Fedora, Arch)
+
+All scripts work natively. No additional dependencies required.
+
+```bash
+# Install Node.js (Ubuntu/Debian)
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt-get install -y nodejs
+
+# Install pnpm
+npm install -g pnpm
+```
+
+### macOS
+
+All scripts work natively. Install via Homebrew:
+
+```bash
+# Install Node.js
+brew install node@20
+
+# Install pnpm
+npm install -g pnpm
+```
+
+### Windows
+
+All scripts work via Node.js. Use PowerShell, Command Prompt, or Git Bash.
+
+```powershell
+# Install Node.js (via winget)
+winget install OpenJS.NodeJS.LTS
+
+# Install pnpm
+npm install -g pnpm
+
+# Or use Chocolatey
+choco install nodejs-lts
+choco install pnpm
+```
+
+**Note:** All scripts (`pnpm build`, `pnpm start`, `pnpm stop`, `pnpm reset-db`) are written in Node.js and work identically on all platforms.
 
 ---
 
@@ -128,7 +204,9 @@ black-sentinel-nexus-free/
   packages/
     types/            # Shared TypeScript types
     ui/               # Shared React components
-  scripts/            # Build and run scripts
+    shared/           # Shared utilities
+    config/           # Configuration management
+  scripts/            # Cross-platform build/run scripts
   docker-compose.yml  # Docker deployment
 ```
 

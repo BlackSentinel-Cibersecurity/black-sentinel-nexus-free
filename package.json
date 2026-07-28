@@ -5,10 +5,14 @@
   "private": true,
   "scripts": {
     "dev": "concurrently \"pnpm --filter @bsn/api dev\" \"pnpm --filter @bsn/web dev\"",
-    "build": "turbo build",
-    "start": "pnpm --filter @bsn/api start & pnpm --filter @bsn/web start",
+    "build": "node scripts/build.js",
+    "build:turbo": "turbo build",
+    "start": "node scripts/start.js",
+    "stop": "node scripts/stop.js",
+    "reset-db": "node scripts/reset-db.js",
     "lint": "turbo lint",
-    "typecheck": "turbo typecheck"
+    "typecheck": "turbo typecheck",
+    "setup": "node scripts/build.js && node scripts/start.js"
   },
   "devDependencies": {
     "concurrently": "^8.2.2",

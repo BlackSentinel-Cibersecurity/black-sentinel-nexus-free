@@ -7,65 +7,91 @@ Thank you for your interest in contributing to BlackSentinel Nexus FREE!
 - **Node.js** >= 18
 - **pnpm** >= 9.0.0
 
+## Supported Platforms
+
+| Platform | Status |
+|----------|--------|
+| Linux (Ubuntu, Debian, CentOS, Fedora, Arch) | Fully supported |
+| macOS | Fully supported |
+| Windows (PowerShell, CMD, Git Bash) | Fully supported |
+| Docker (any OS) | Fully supported |
+
 ## Development Setup
+
+### All Platforms (Node.js scripts)
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-org/black-sentinel-nexus-free.git
+git clone https://github.com/BlackSentinel-Cibersecurity/black-sentinel-nexus-free.git
 cd black-sentinel-nexus-free
 
 # Install dependencies
 pnpm install
 
-# Copy environment variables
-cp .env.example apps/api/.env
-
-# Build shared packages
-pnpm --filter @bsn/types build
-pnpm --filter @bsn/ui build
+# Build all packages
+pnpm build
 
 # Start development servers
 pnpm dev
 ```
 
-The application will be available at:
-- **Web UI**: http://localhost:3000
-- **API**: http://localhost:3001
-- **API Docs**: http://localhost:3001/docs
-
-### Default Credentials
-
-- **Email**: admin@blacksentinel.io
-- **Password**: Admin@123
-
-## Project Structure
-
-```
-black-sentinel-nexus-free/
-  apps/
-    api/          # NestJS backend (port 3001)
-    web/          # Next.js frontend (port 3000)
-  packages/
-    types/        # Shared TypeScript type definitions
-    ui/           # Shared React component library
-  scripts/        # Build and run scripts
-```
-
-## Available Scripts
+### Linux (Ubuntu/Debian)
 
 ```bash
-# Development
-pnpm dev              # Start both API and Web in dev mode
-pnpm build            # Build all packages and apps
-pnpm lint             # Run linting
-pnpm typecheck        # Run type checking
+# Install Node.js
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt-get install -y nodejs
 
-# Individual packages
-pnpm --filter @bsn/api dev       # Start API only
-pnpm --filter @bsn/web dev       # Start Web only
-pnpm --filter @bsn/types build   # Build types package
-pnpm --filter @bsn/ui build      # Build UI package
+# Install pnpm
+npm install -g pnpm
+
+# Run the project
+pnpm install && pnpm build && pnpm dev
 ```
+
+### macOS
+
+```bash
+# Install Node.js
+brew install node@20
+
+# Install pnpm
+npm install -g pnpm
+
+# Run the project
+pnpm install && pnpm build && pnpm dev
+```
+
+### Windows
+
+```powershell
+# Install Node.js (via winget)
+winget install OpenJS.NodeJS.LTS
+
+# Install pnpm
+npm install -g pnpm
+
+# Run the project
+pnpm install; pnpm build; pnpm dev
+```
+
+### Docker
+
+```bash
+docker-compose up -d
+```
+
+## Available Commands
+
+| Command | Description |
+|---------|-------------|
+| `pnpm dev` | Start in development mode |
+| `pnpm build` | Build all packages and apps |
+| `pnpm start` | Start in production mode |
+| `pnpm stop` | Stop all running servers |
+| `pnpm reset-db` | Reset database to fresh state |
+| `pnpm lint` | Run linting |
+| `pnpm typecheck` | Run type checking |
 
 ## Making Changes
 
@@ -81,6 +107,13 @@ pnpm --filter @bsn/ui build      # Build UI package
 - Use existing patterns and conventions in the codebase
 - Keep components and services focused on single responsibility
 - Add types for all new interfaces and DTOs
+
+## Cross-Platform Guidelines
+
+- All scripts in `scripts/` are written in Node.js (not bash)
+- Use `path.join()` for file paths (never hardcoded `/` or `\`)
+- Use `child_process` with `shell: true` for cross-platform command execution
+- Test on multiple platforms when possible
 
 ## Reporting Issues
 
