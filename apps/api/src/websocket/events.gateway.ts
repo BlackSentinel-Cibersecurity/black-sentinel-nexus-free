@@ -9,9 +9,11 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
 
 @WebSocketGateway({
-  cors: { origin: '*' },
+  cors: { origin: true },
   namespace: '/ws',
 })
 export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -21,10 +23,51 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   private logger = new Logger('EventsGateway');
   private connectedClients = new Map<string, { userId?: string; rooms: Set<string> }>();
 
-  handleConnection(client: Socket) {
-    this.connectedClients.set(client.id, { rooms: new Set() });
-    this.logger.log(`Client connected: ${client.id}`);
-    client.emit('connected', { clientId: client.id, timestamp: new Date().toISOString() });
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly jwtService: JwtService,
+  ) {}
+
+  async handleConnection(client: Socket) {
+    // Validate origin
+    const allowedOrigin = this.configService.get<string>('CORS_ORIGIN') || 'http://localhost:3000';
+    const origin = client.handshake.headers.origin;
+    
+    if (origin && !this.isOriginAllowed(origin, allowedOrigin)) {
+      this.logger.warn(`Rejected connection from unauthorized origin: ${origin}`);
+      client.disconnect();
+      return;
+    }
+
+    // Validate JWT token from handshake auth or query
+    const token = client.handshake.auth?.token || client.handshake.query?.token;
+    if (!token) {
+      this.logger.warn(`Client ${client.id} disconnected: no token provided`);
+      client.disconnect();
+      return;
+    }
+
+    try {
+      const payload = this.jwtService.verify(token, { secret: this.configService.get<string>('JWT_SECRET') });
+      const userId = payload.sub;
+      
+      this.connectedClients.set(client.id, { userId, rooms: new Set() });
+      this.logger.log(`Client connected: ${client.id} (user: ${userId})`);
+      client.emit('connected', { clientId: client.id, userId, timestamp: new Date().toISOString() });
+    } catch (err) {
+      this.logger.warn(`Client ${client.id} disconnected: invalid token`);
+      client.disconnect();
+    }
+  }
+
+  private isOriginAllowed(origin: string, allowedOrigin: string): boolean {
+    try {
+      const allowed = new URL(allowedOrigin).origin;
+      const requestOrigin = new URL(origin).origin;
+      return allowed === requestOrigin;
+    } catch {
+      return false;
+    }
   }
 
   handleDisconnect(client: Socket) {
@@ -34,9 +77,24 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('join')
   handleJoin(@ConnectedSocket() client: Socket, @MessageBody() data: { room: string }) {
-    client.join(data.room);
     const clientInfo = this.connectedClients.get(client.id);
-    if (clientInfo) clientInfo.rooms.add(data.room);
+    if (!clientInfo) {
+      client.disconnect();
+      return { event: 'error', data: { message: 'Not authenticated' } };
+    }
+
+    // SECURITY FIX: handleConnection already verifies the JWT, but nothing
+    // stopped an authenticated client from joining ANY room by name,
+    // including another user's private notification room
+    // (`user:${otherUserId}`, see broadcastNotification below) — a client
+    // could just guess/enumerate ids and read someone else's notifications.
+    if (data.room.startsWith('user:') && data.room !== `user:${clientInfo.userId}`) {
+      this.logger.warn(`Client ${client.id} (user ${clientInfo.userId}) denied join of ${data.room}`);
+      return { event: 'error', data: { message: 'Forbidden' } };
+    }
+
+    client.join(data.room);
+    clientInfo.rooms.add(data.room);
     this.logger.log(`Client ${client.id} joined room: ${data.room}`);
     return { event: 'joined', data: { room: data.room } };
   }

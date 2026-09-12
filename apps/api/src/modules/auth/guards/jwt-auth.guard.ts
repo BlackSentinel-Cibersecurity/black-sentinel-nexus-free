@@ -1,8 +1,5 @@
 import { Injectable, ExecutionContext, UnauthorizedException } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import * as jwt from 'jsonwebtoken';
-
-const JWT_SECRET = process.env.JWT_SECRET || 'blacksentinel-nexus-secret-key-2024';
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
@@ -10,22 +7,19 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     return super.canActivate(context);
   }
 
-  handleRequest(err: any, user: any, _info: any, context: ExecutionContext) {
+  // SECURITY FIX: this used to catch any error/missing-user from the passport
+  // 'jwt' strategy (JwtStrategy.validate(), which checks the user still
+  // exists and isActive) and fall back to manually re-verifying the raw JWT
+  // itself — trusting whatever `sub`/`email`/`role` was in the token's stale
+  // claims with NO re-check that the user is still active or even exists.
+  // That meant a deactivated or deleted user's still-unexpired token kept
+  // working forever, completely bypassing the isActive/exists check the
+  // primary strategy exists to enforce. There is no legitimate case where
+  // this fallback should grant access that the primary strategy denied, so
+  // it's removed rather than reproduced with an extra check bolted on.
+  handleRequest(err: any, user: any) {
     if (err || !user) {
-      const request = context.switchToHttp().getRequest();
-      const authHeader = request.headers?.authorization;
-      if (authHeader?.startsWith('Bearer ')) {
-        try {
-          const token = authHeader.substring(7);
-          const payload = jwt.verify(token, JWT_SECRET, { algorithms: ['HS256'] }) as any;
-          const fallbackUser = { id: payload.sub, email: payload.email, role: payload.role };
-          request.user = fallbackUser;
-          return fallbackUser;
-        } catch (e) {
-          // fall through
-        }
-      }
-      throw new UnauthorizedException();
+      throw err || new UnauthorizedException();
     }
     return user;
   }
