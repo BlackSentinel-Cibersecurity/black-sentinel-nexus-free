@@ -10,7 +10,9 @@ export class NotificationsController {
   @Get()
   findAll(@Req() req: any) {
     const userId = req.user?.id;
-    return this.notificationService.findByUser(userId).then(data => ({ data }));
+    return this.notificationService
+      .findByUser(userId)
+      .then((data) => ({ data }));
   }
 
   @Get('unread-count')

@@ -1,7 +1,14 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Incident, IncidentStatus } from '../../database/entities/incident.entity';
+import {
+  Incident,
+  IncidentStatus,
+} from '../../database/entities/incident.entity';
 
 const VALID_TRANSITIONS: Record<IncidentStatus, IncidentStatus[]> = {
   new: ['triaged', 'investigating', 'closed'],
@@ -83,19 +90,30 @@ export class IncidentsService {
       affectedAssetIds: dto.affectedAssetIds || [],
       relatedEventIds: dto.relatedEventIds || [],
       mitreTechnique: dto.mitreTechnique || null,
-      timeline: [{ timestamp: new Date(), action: 'created', details: 'Incident created' }],
+      timeline: [
+        {
+          timestamp: new Date(),
+          action: 'created',
+          details: 'Incident created',
+        },
+      ],
     });
 
     return this.incidentRepo.save(incident);
   }
 
-  async updateStatus(id: string, newStatus: IncidentStatus, userId?: string, notes?: string): Promise<Incident> {
+  async updateStatus(
+    id: string,
+    newStatus: IncidentStatus,
+    userId?: string,
+    notes?: string,
+  ): Promise<Incident> {
     const incident = await this.findById(id);
     const currentStatus = incident.status as IncidentStatus;
 
     if (!VALID_TRANSITIONS[currentStatus]?.includes(newStatus)) {
       throw new BadRequestException(
-        `Cannot transition from "${currentStatus}" to "${newStatus}". Valid transitions: ${VALID_TRANSITIONS[currentStatus]?.join(', ') || 'none'}`
+        `Cannot transition from "${currentStatus}" to "${newStatus}". Valid transitions: ${VALID_TRANSITIONS[currentStatus]?.join(', ') || 'none'}`,
       );
     }
 
@@ -116,13 +134,16 @@ export class IncidentsService {
     return this.incidentRepo.save(incident);
   }
 
-  async update(id: string, dto: Partial<{
-    title: string;
-    description: string;
-    severity: string;
-    assignedTo: string;
-    mitreTechnique: string;
-  }>): Promise<Incident> {
+  async update(
+    id: string,
+    dto: Partial<{
+      title: string;
+      description: string;
+      severity: string;
+      assignedTo: string;
+      mitreTechnique: string;
+    }>,
+  ): Promise<Incident> {
     const incident = await this.findById(id);
     Object.assign(incident, dto);
 
@@ -142,7 +163,12 @@ export class IncidentsService {
     incident.notes.push({ timestamp: new Date(), user, content });
 
     if (!incident.timeline) incident.timeline = [];
-    incident.timeline.push({ timestamp: new Date(), action: 'note_added', user, details: content });
+    incident.timeline.push({
+      timestamp: new Date(),
+      action: 'note_added',
+      user,
+      details: content,
+    });
 
     return this.incidentRepo.save(incident);
   }
@@ -169,15 +195,25 @@ export class IncidentsService {
       .groupBy('i.status')
       .getRawMany();
 
-    const open = await this.incidentRepo.count({ where: { status: 'new' as any } });
-    const active = await this.incidentRepo.count({ where: { status: 'investigating' as any } });
+    const open = await this.incidentRepo.count({
+      where: { status: 'new' as any },
+    });
+    const active = await this.incidentRepo.count({
+      where: { status: 'investigating' as any },
+    });
 
     return {
       total,
       open,
       active,
-      bySeverity: bySeverity.reduce((acc: any, r: any) => ({ ...acc, [r.severity]: parseInt(r.count, 10) }), {}),
-      byStatus: byStatus.reduce((acc: any, r: any) => ({ ...acc, [r.status]: parseInt(r.count, 10) }), {}),
+      bySeverity: bySeverity.reduce(
+        (acc: any, r: any) => ({ ...acc, [r.severity]: parseInt(r.count, 10) }),
+        {},
+      ),
+      byStatus: byStatus.reduce(
+        (acc: any, r: any) => ({ ...acc, [r.status]: parseInt(r.count, 10) }),
+        {},
+      ),
     };
   }
 }

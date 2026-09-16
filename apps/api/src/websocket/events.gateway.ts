@@ -21,7 +21,10 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   server!: Server;
 
   private logger = new Logger('EventsGateway');
-  private connectedClients = new Map<string, { userId?: string; rooms: Set<string> }>();
+  private connectedClients = new Map<
+    string,
+    { userId?: string; rooms: Set<string> }
+  >();
 
   constructor(
     private readonly configService: ConfigService,
@@ -30,11 +33,14 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   async handleConnection(client: Socket) {
     // Validate origin
-    const allowedOrigin = this.configService.get<string>('CORS_ORIGIN') || 'http://localhost:3000';
+    const allowedOrigin =
+      this.configService.get<string>('CORS_ORIGIN') || 'http://localhost:3000';
     const origin = client.handshake.headers.origin;
-    
+
     if (origin && !this.isOriginAllowed(origin, allowedOrigin)) {
-      this.logger.warn(`Rejected connection from unauthorized origin: ${origin}`);
+      this.logger.warn(
+        `Rejected connection from unauthorized origin: ${origin}`,
+      );
       client.disconnect();
       return;
     }
@@ -48,12 +54,18 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     try {
-      const payload = this.jwtService.verify(token, { secret: this.configService.get<string>('JWT_SECRET') });
+      const payload = this.jwtService.verify(token, {
+        secret: this.configService.get<string>('JWT_SECRET'),
+      });
       const userId = payload.sub;
-      
+
       this.connectedClients.set(client.id, { userId, rooms: new Set() });
       this.logger.log(`Client connected: ${client.id} (user: ${userId})`);
-      client.emit('connected', { clientId: client.id, userId, timestamp: new Date().toISOString() });
+      client.emit('connected', {
+        clientId: client.id,
+        userId,
+        timestamp: new Date().toISOString(),
+      });
     } catch (err) {
       this.logger.warn(`Client ${client.id} disconnected: invalid token`);
       client.disconnect();
@@ -76,7 +88,10 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('join')
-  handleJoin(@ConnectedSocket() client: Socket, @MessageBody() data: { room: string }) {
+  handleJoin(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() data: { room: string },
+  ) {
     const clientInfo = this.connectedClients.get(client.id);
     if (!clientInfo) {
       client.disconnect();
@@ -88,8 +103,13 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     // including another user's private notification room
     // (`user:${otherUserId}`, see broadcastNotification below) — a client
     // could just guess/enumerate ids and read someone else's notifications.
-    if (data.room.startsWith('user:') && data.room !== `user:${clientInfo.userId}`) {
-      this.logger.warn(`Client ${client.id} (user ${clientInfo.userId}) denied join of ${data.room}`);
+    if (
+      data.room.startsWith('user:') &&
+      data.room !== `user:${clientInfo.userId}`
+    ) {
+      this.logger.warn(
+        `Client ${client.id} (user ${clientInfo.userId}) denied join of ${data.room}`,
+      );
       return { event: 'error', data: { message: 'Forbidden' } };
     }
 
@@ -100,7 +120,10 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('leave')
-  handleLeave(@ConnectedSocket() client: Socket, @MessageBody() data: { room: string }) {
+  handleLeave(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() data: { room: string },
+  ) {
     client.leave(data.room);
     const clientInfo = this.connectedClients.get(client.id);
     if (clientInfo) clientInfo.rooms.delete(data.room);

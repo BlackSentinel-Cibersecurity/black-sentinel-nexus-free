@@ -38,11 +38,18 @@ export class AuditService {
   }): Promise<{ data: AuditLog[]; total: number }> {
     const qb = this.auditRepo.createQueryBuilder('a');
 
-    if (filters?.userId) qb.andWhere('a.userId = :userId', { userId: filters.userId });
-    if (filters?.action) qb.andWhere('a.action = :action', { action: filters.action });
-    if (filters?.resource) qb.andWhere('a.resource = :resource', { resource: filters.resource });
-    if (filters?.startDate) qb.andWhere('a.createdAt >= :startDate', { startDate: filters.startDate });
-    if (filters?.endDate) qb.andWhere('a.createdAt <= :endDate', { endDate: filters.endDate });
+    if (filters?.userId)
+      qb.andWhere('a.userId = :userId', { userId: filters.userId });
+    if (filters?.action)
+      qb.andWhere('a.action = :action', { action: filters.action });
+    if (filters?.resource)
+      qb.andWhere('a.resource = :resource', { resource: filters.resource });
+    if (filters?.startDate)
+      qb.andWhere('a.createdAt >= :startDate', {
+        startDate: filters.startDate,
+      });
+    if (filters?.endDate)
+      qb.andWhere('a.createdAt <= :endDate', { endDate: filters.endDate });
 
     qb.orderBy('a.createdAt', 'DESC');
 

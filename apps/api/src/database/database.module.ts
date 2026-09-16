@@ -1,15 +1,37 @@
 import { Module, Global } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import {
-  User, UserSettings, SecurityEvent, Incident, Alert, Asset, Connector,
-  Playbook, PlaybookExecution, ThreatIndicator, ThreatFeed,
-  AuditLog, CorrelationRule, Notification,
+  User,
+  UserSettings,
+  SecurityEvent,
+  Incident,
+  Alert,
+  Asset,
+  Connector,
+  Playbook,
+  PlaybookExecution,
+  ThreatIndicator,
+  ThreatFeed,
+  AuditLog,
+  CorrelationRule,
+  Notification,
 } from './entities';
 
 const entities = [
-  User, UserSettings, SecurityEvent, Incident, Alert, Asset, Connector,
-  Playbook, PlaybookExecution, ThreatIndicator, ThreatFeed,
-  AuditLog, CorrelationRule, Notification,
+  User,
+  UserSettings,
+  SecurityEvent,
+  Incident,
+  Alert,
+  Asset,
+  Connector,
+  Playbook,
+  PlaybookExecution,
+  ThreatIndicator,
+  ThreatFeed,
+  AuditLog,
+  CorrelationRule,
+  Notification,
 ];
 
 const isDev = process.env.NODE_ENV !== 'production';
@@ -30,7 +52,10 @@ const usePostgres = process.env.DB_HOST || process.env.USE_PG;
             entities,
             synchronize: isDev,
             logging: isDev,
-            ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
+            ssl:
+              process.env.DB_SSL === 'true'
+                ? { rejectUnauthorized: false }
+                : false,
           }
         : {
             type: 'better-sqlite3',
@@ -38,7 +63,7 @@ const usePostgres = process.env.DB_HOST || process.env.USE_PG;
             entities,
             synchronize: isDev,
             logging: false,
-          }
+          },
     ),
     TypeOrmModule.forFeature(entities),
   ],

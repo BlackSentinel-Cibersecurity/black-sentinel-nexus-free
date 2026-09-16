@@ -5,9 +5,7 @@ import { Asset } from '../../database/entities/asset.entity';
 
 @Injectable()
 export class AssetsService {
-  constructor(
-    @InjectRepository(Asset) private assetRepo: Repository<Asset>,
-  ) {
+  constructor(@InjectRepository(Asset) private assetRepo: Repository<Asset>) {
     this.seedAssets();
   }
 
@@ -17,18 +15,61 @@ export class AssetsService {
 
     // FREE VERSION: Only 4 assets (vs 8 in full version)
     const assets = [
-      { name: 'WEB-PROD-01', type: 'server' as const, ip: '10.0.1.10', os: 'Ubuntu 22.04', status: 'critical' as const, riskScore: 92, riskLevel: 'critical', location: 'US-East' },
-      { name: 'DB-PRIMARY', type: 'database' as const, ip: '10.0.1.20', os: 'PostgreSQL 15', status: 'warning' as const, riskScore: 87, riskLevel: 'critical', location: 'US-East' },
-      { name: 'FW-NORTH', type: 'firewall' as const, ip: '10.0.0.1', os: 'FortiOS 7.2', status: 'active' as const, riskScore: 45, riskLevel: 'low', location: 'US-East' },
-      { name: 'API-GW-01', type: 'server' as const, ip: '10.0.1.30', os: 'Amazon Linux 2', status: 'active' as const, riskScore: 78, riskLevel: 'high', location: 'US-West' },
+      {
+        name: 'WEB-PROD-01',
+        type: 'server' as const,
+        ip: '10.0.1.10',
+        os: 'Ubuntu 22.04',
+        status: 'critical' as const,
+        riskScore: 92,
+        riskLevel: 'critical',
+        location: 'US-East',
+      },
+      {
+        name: 'DB-PRIMARY',
+        type: 'database' as const,
+        ip: '10.0.1.20',
+        os: 'PostgreSQL 15',
+        status: 'warning' as const,
+        riskScore: 87,
+        riskLevel: 'critical',
+        location: 'US-East',
+      },
+      {
+        name: 'FW-NORTH',
+        type: 'firewall' as const,
+        ip: '10.0.0.1',
+        os: 'FortiOS 7.2',
+        status: 'active' as const,
+        riskScore: 45,
+        riskLevel: 'low',
+        location: 'US-East',
+      },
+      {
+        name: 'API-GW-01',
+        type: 'server' as const,
+        ip: '10.0.1.30',
+        os: 'Amazon Linux 2',
+        status: 'active' as const,
+        riskScore: 78,
+        riskLevel: 'high',
+        location: 'US-West',
+      },
     ];
 
     for (const a of assets) {
-      await this.assetRepo.save(this.assetRepo.create({ ...a, lastSeenAt: new Date() }));
+      await this.assetRepo.save(
+        this.assetRepo.create({ ...a, lastSeenAt: new Date() }),
+      );
     }
   }
 
-  async findAll(filters?: { type?: string; status?: string; page?: number; limit?: number }) {
+  async findAll(filters?: {
+    type?: string;
+    status?: string;
+    page?: number;
+    limit?: number;
+  }) {
     const where: any = {};
     if (filters?.type) where.type = filters.type;
     if (filters?.status) where.status = filters.status;
@@ -74,8 +115,8 @@ export class AssetsService {
       label: a.name,
       status: a.status === 'active' ? 'healthy' : a.status,
       riskLevel: a.riskLevel,
-      x: Math.cos(i * (2 * Math.PI / assets.length)) * 4,
-      y: Math.sin(i * (2 * Math.PI / assets.length)) * 2,
+      x: Math.cos(i * ((2 * Math.PI) / assets.length)) * 4,
+      y: Math.sin(i * ((2 * Math.PI) / assets.length)) * 2,
       z: (Math.random() - 0.5) * 4,
     }));
 
@@ -83,7 +124,11 @@ export class AssetsService {
     for (let i = 0; i < nodes.length; i++) {
       for (let j = i + 1; j < nodes.length; j++) {
         if (Math.random() > 0.6) {
-          edges.push({ source: nodes[i].id, target: nodes[j].id, status: Math.random() > 0.9 ? 'compromised' : 'active' });
+          edges.push({
+            source: nodes[i].id,
+            target: nodes[j].id,
+            status: Math.random() > 0.9 ? 'compromised' : 'active',
+          });
         }
       }
     }
@@ -94,16 +139,28 @@ export class AssetsService {
   async getStats() {
     const total = await this.assetRepo.count();
     const byType = await this.assetRepo
-      .createQueryBuilder('a').select('a.type', 'type').addSelect('COUNT(*)', 'count')
-      .groupBy('a.type').getRawMany();
+      .createQueryBuilder('a')
+      .select('a.type', 'type')
+      .addSelect('COUNT(*)', 'count')
+      .groupBy('a.type')
+      .getRawMany();
     const byStatus = await this.assetRepo
-      .createQueryBuilder('a').select('a.status', 'status').addSelect('COUNT(*)', 'count')
-      .groupBy('a.status').getRawMany();
+      .createQueryBuilder('a')
+      .select('a.status', 'status')
+      .addSelect('COUNT(*)', 'count')
+      .groupBy('a.status')
+      .getRawMany();
 
     return {
       total,
-      byType: byType.reduce((acc: any, r: any) => ({ ...acc, [r.type]: parseInt(r.count, 10) }), {}),
-      byStatus: byStatus.reduce((acc: any, r: any) => ({ ...acc, [r.status]: parseInt(r.count, 10) }), {}),
+      byType: byType.reduce(
+        (acc: any, r: any) => ({ ...acc, [r.type]: parseInt(r.count, 10) }),
+        {},
+      ),
+      byStatus: byStatus.reduce(
+        (acc: any, r: any) => ({ ...acc, [r.status]: parseInt(r.count, 10) }),
+        {},
+      ),
     };
   }
 }

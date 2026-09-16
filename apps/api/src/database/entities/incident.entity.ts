@@ -1,7 +1,21 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, Index } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  Index,
+} from 'typeorm';
 
 export type IncidentSeverity = 'critical' | 'high' | 'medium' | 'low';
-export type IncidentStatus = 'new' | 'triaged' | 'investigating' | 'contained' | 'eradicated' | 'recovered' | 'closed';
+export type IncidentStatus =
+  | 'new'
+  | 'triaged'
+  | 'investigating'
+  | 'contained'
+  | 'eradicated'
+  | 'recovered'
+  | 'closed';
 
 @Entity('incidents')
 @Index(['severity'])
@@ -42,7 +56,12 @@ export class Incident {
   mitreTechnique!: string | null;
 
   @Column({ type: 'simple-json', nullable: true })
-  timeline!: Array<{ timestamp: Date; action: string; user?: string; details?: string }> | null;
+  timeline!: Array<{
+    timestamp: Date;
+    action: string;
+    user?: string;
+    details?: string;
+  }> | null;
 
   @Column({ type: 'simple-json', nullable: true })
   notes!: Array<{ timestamp: Date; user: string; content: string }> | null;

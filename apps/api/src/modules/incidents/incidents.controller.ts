@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Patch, Delete, Body, Param, Query, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Delete,
+  Body,
+  Param,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { IncidentsService } from './incidents.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -20,7 +30,9 @@ export class IncidentsController {
     @Query('limit') limit?: string,
   ) {
     return this.incidentsService.findAll({
-      severity, status, assignedTo,
+      severity,
+      status,
+      assignedTo,
       page: page ? parseInt(page, 10) : 1,
       limit: limit ? parseInt(limit, 10) : 50,
     });
@@ -40,16 +52,19 @@ export class IncidentsController {
 
   @Post()
   @ApiOperation({ summary: 'Create incident' })
-  create(@Body() body: {
-    title: string;
-    description?: string;
-    severity: string;
-    source: string;
-    assignedTo?: string;
-    affectedAssetIds?: string[];
-    relatedEventIds?: string[];
-    mitreTechnique?: string;
-  }) {
+  create(
+    @Body()
+    body: {
+      title: string;
+      description?: string;
+      severity: string;
+      source: string;
+      assignedTo?: string;
+      affectedAssetIds?: string[];
+      relatedEventIds?: string[];
+      mitreTechnique?: string;
+    },
+  ) {
     return this.incidentsService.create(body);
   }
 
@@ -59,14 +74,25 @@ export class IncidentsController {
     @Param('id') id: string,
     @Body() body: { status: string; notes?: string; userId?: string },
   ) {
-    return this.incidentsService.updateStatus(id, body.status as any, body.userId, body.notes);
+    return this.incidentsService.updateStatus(
+      id,
+      body.status as any,
+      body.userId,
+      body.notes,
+    );
   }
 
   @Patch(':id')
   @ApiOperation({ summary: 'Update incident' })
   update(
     @Param('id') id: string,
-    @Body() body: { title?: string; description?: string; severity?: string; assignedTo?: string },
+    @Body()
+    body: {
+      title?: string;
+      description?: string;
+      severity?: string;
+      assignedTo?: string;
+    },
   ) {
     return this.incidentsService.update(id, body);
   }

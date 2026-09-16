@@ -1,5 +1,11 @@
 import { Controller, Get, Query, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+  ApiQuery,
+} from '@nestjs/swagger';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Alert } from '../../database/entities/alert.entity';
@@ -10,9 +16,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 export class CorrelationController {
-  constructor(
-    @InjectRepository(Alert) private alertRepo: Repository<Alert>,
-  ) {}
+  constructor(@InjectRepository(Alert) private alertRepo: Repository<Alert>) {}
 
   @Get('alerts')
   @ApiOperation({ summary: 'Get correlation alerts' })
@@ -42,7 +46,8 @@ export class CorrelationController {
   @ApiOperation({ summary: 'Get correlation rules' })
   @ApiResponse({ status: 200, description: 'Rules returned' })
   async getRules() {
-    const { CorrelationRule } = await import('../../database/entities/audit-log.entity');
+    const { CorrelationRule } =
+      await import('../../database/entities/audit-log.entity');
     return this.alertRepo.manager.find(CorrelationRule);
   }
 }

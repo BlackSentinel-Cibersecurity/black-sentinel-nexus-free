@@ -45,7 +45,8 @@ export class EventsService {
   private flushInterval: NodeJS.Timeout | null = null;
 
   constructor(
-    @InjectRepository(SecurityEvent) private eventRepo: Repository<SecurityEvent>,
+    @InjectRepository(SecurityEvent)
+    private eventRepo: Repository<SecurityEvent>,
     private correlationEngine: CorrelationEngine,
     private wsGateway: EventsGateway,
   ) {
@@ -108,7 +109,9 @@ export class EventsService {
     return { count: events.length };
   }
 
-  async queryEvents(query: QueryEventsDto): Promise<{ data: SecurityEvent[]; total: number }> {
+  async queryEvents(
+    query: QueryEventsDto,
+  ): Promise<{ data: SecurityEvent[]; total: number }> {
     const qb = this.eventRepo.createQueryBuilder('e');
 
     if (query.startDate && query.endDate) {
@@ -119,11 +122,15 @@ export class EventsService {
     }
 
     if (query.categories?.length) {
-      qb.andWhere('e.category IN (:...categories)', { categories: query.categories });
+      qb.andWhere('e.category IN (:...categories)', {
+        categories: query.categories,
+      });
     }
 
     if (query.severities?.length) {
-      qb.andWhere('e.severity IN (:...severities)', { severities: query.severities });
+      qb.andWhere('e.severity IN (:...severities)', {
+        severities: query.severities,
+      });
     }
 
     if (query.sources?.length) {
@@ -135,7 +142,9 @@ export class EventsService {
     }
 
     if (query.destinationIp) {
-      qb.andWhere('e.destinationIp = :destinationIp', { destinationIp: query.destinationIp });
+      qb.andWhere('e.destinationIp = :destinationIp', {
+        destinationIp: query.destinationIp,
+      });
     }
 
     if (query.userId) {
@@ -147,7 +156,10 @@ export class EventsService {
     }
 
     if (query.search) {
-      qb.andWhere('(LOWER(e.message) LIKE LOWER(:search) OR LOWER(e.eventType) LIKE LOWER(:search))', { search: `%${query.search}%` });
+      qb.andWhere(
+        '(LOWER(e.message) LIKE LOWER(:search) OR LOWER(e.eventType) LIKE LOWER(:search))',
+        { search: `%${query.search}%` },
+      );
     }
 
     const page = query.page || 1;
@@ -193,7 +205,9 @@ export class EventsService {
       .getRawMany();
 
     const last24h = await this.eventRepo.count({
-      where: { timestamp: Between(new Date(Date.now() - 86400000), new Date()) },
+      where: {
+        timestamp: Between(new Date(Date.now() - 86400000), new Date()),
+      },
     });
 
     const last1h = await this.eventRepo.count({
@@ -204,9 +218,18 @@ export class EventsService {
       total,
       last24h,
       last1h,
-      bySeverity: bySeverity.reduce((acc, r) => ({ ...acc, [r.severity]: parseInt(r.count, 10) }), {}),
-      byCategory: byCategory.reduce((acc, r) => ({ ...acc, [r.category]: parseInt(r.count, 10) }), {}),
-      bySource: bySource.map(r => ({ source: r.source, count: parseInt(r.count, 10) })),
+      bySeverity: bySeverity.reduce(
+        (acc, r) => ({ ...acc, [r.severity]: parseInt(r.count, 10) }),
+        {},
+      ),
+      byCategory: byCategory.reduce(
+        (acc, r) => ({ ...acc, [r.category]: parseInt(r.count, 10) }),
+        {},
+      ),
+      bySource: bySource.map((r) => ({
+        source: r.source,
+        count: parseInt(r.count, 10),
+      })),
     };
   }
 
@@ -244,7 +267,9 @@ export class EventsService {
       .addSelect('COUNT(*)', 'events')
       .addSelect('COUNT(DISTINCT e.severity)', 'severityCount')
       .where('e.sourceIp IS NOT NULL')
-      .andWhere('e.timestamp >= :start', { start: new Date(Date.now() - 86400000) })
+      .andWhere('e.timestamp >= :start', {
+        start: new Date(Date.now() - 86400000),
+      })
       .groupBy('e.sourceIp')
       .orderBy('events', 'DESC')
       .limit(limit)

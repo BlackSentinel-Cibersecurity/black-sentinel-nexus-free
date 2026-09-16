@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Param, Query, Body, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Param,
+  Query,
+  Body,
+  UseGuards,
+} from '@nestjs/common';
 import { ThreatsService } from './threats.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
@@ -13,10 +21,15 @@ export class ThreatsController {
   }
 
   @Get('feeds')
-  getFeeds() { return this.threatsService.getFeeds(); }
+  getFeeds() {
+    return this.threatsService.getFeeds();
+  }
 
   @Get('indicators')
-  getIndicators(@Query('type') type?: string, @Query('severity') severity?: string) {
+  getIndicators(
+    @Query('type') type?: string,
+    @Query('severity') severity?: string,
+  ) {
     return this.threatsService.findAllIndicators({ type, severity });
   }
 
@@ -26,7 +39,9 @@ export class ThreatsController {
   }
 
   @Get('stats')
-  getStats() { return this.threatsService.getStats(); }
+  getStats() {
+    return this.threatsService.getStats();
+  }
 
   @Get(':id')
   findOne(@Param('id') id: string) {

@@ -1,5 +1,10 @@
 import { Controller, Post, Body, Get, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { AIService } from './ai.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { AIAnalysisRequest, NaturalLanguageQuery } from '@bsn/types';
@@ -33,7 +38,7 @@ export class AIController {
   @ApiOperation({ summary: 'Translate natural language to query language' })
   @ApiResponse({ status: 200, description: 'Query translated' })
   async translateQuery(
-    @Body() body: { query: string; targetLanguage: string }
+    @Body() body: { query: string; targetLanguage: string },
   ) {
     return this.aiService.translateQuery(body.query, body.targetLanguage);
   }

@@ -12,7 +12,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
       algorithms: ['HS256'],
-      secretOrKey: process.env.JWT_SECRET || 'blacksentinel-nexus-secret-key-2024',
+      secretOrKey:
+        process.env.JWT_SECRET || 'blacksentinel-nexus-secret-key-2024',
     });
   }
 

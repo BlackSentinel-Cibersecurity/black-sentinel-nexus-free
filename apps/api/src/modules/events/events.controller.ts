@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Param, Query, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { EventsService } from './events.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
@@ -35,14 +43,17 @@ export class EventsController {
       categories: categories?.split(','),
       severities: severities?.split(','),
       sources: sources?.split(','),
-      sourceIp, search,
+      sourceIp,
+      search,
       page: page ? parseInt(page, 10) : 1,
       limit: limit ? parseInt(limit, 10) : 100,
     });
   }
 
   @Get('stats')
-  async getStats() { return this.eventsService.getStats(); }
+  async getStats() {
+    return this.eventsService.getStats();
+  }
 
   @Get('timeline')
   async getTimeline(@Query('minutes') minutes?: string) {

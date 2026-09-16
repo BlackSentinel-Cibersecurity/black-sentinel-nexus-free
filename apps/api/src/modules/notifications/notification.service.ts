@@ -63,7 +63,7 @@ export class NotificationService {
   }
 
   async createBulk(dtos: CreateNotificationDto[]): Promise<Notification[]> {
-    const notifs = dtos.map(d => this.notifRepo.create(d));
+    const notifs = dtos.map((d) => this.notifRepo.create(d));
     const saved = await this.notifRepo.save(notifs);
     for (const n of saved) {
       this.wsGateway.broadcastNotification(n.userId, n);
@@ -71,10 +71,17 @@ export class NotificationService {
     return saved;
   }
 
-  async findByUser(userId: string, unreadOnly = false): Promise<Notification[]> {
+  async findByUser(
+    userId: string,
+    unreadOnly = false,
+  ): Promise<Notification[]> {
     const where: any = { userId };
     if (unreadOnly) where.status = 'unread';
-    return this.notifRepo.find({ where, order: { createdAt: 'DESC' }, take: 50 });
+    return this.notifRepo.find({
+      where,
+      order: { createdAt: 'DESC' },
+      take: 50,
+    });
   }
 
   async markAsRead(id: string): Promise<void> {
@@ -82,7 +89,10 @@ export class NotificationService {
   }
 
   async markAllAsRead(userId: string): Promise<void> {
-    await this.notifRepo.update({ userId, status: 'unread' }, { status: 'read' });
+    await this.notifRepo.update(
+      { userId, status: 'unread' },
+      { status: 'read' },
+    );
   }
 
   async getUnreadCount(userId: string): Promise<number> {
@@ -91,7 +101,7 @@ export class NotificationService {
 
   async notifyAlertCreated(alert: any) {
     const admins = await this.notifRepo.query(
-      `SELECT id FROM users WHERE role = 'admin' AND "isActive" = true`
+      `SELECT id FROM users WHERE role = 'admin' AND "isActive" = true`,
     );
     for (const admin of admins) {
       await this.create({
@@ -107,7 +117,7 @@ export class NotificationService {
 
   async notifyIncidentCreated(incident: any) {
     const admins = await this.notifRepo.query(
-      `SELECT id FROM users WHERE role = 'admin' AND "isActive" = true`
+      `SELECT id FROM users WHERE role = 'admin' AND "isActive" = true`,
     );
     for (const admin of admins) {
       await this.create({
@@ -133,7 +143,13 @@ export class NotificationService {
     }
 
     if (config.webhook?.enabled && config.webhook.url) {
-      promises.push(this.sendWebhook(config.webhook.url, config.webhook.headers, notification));
+      promises.push(
+        this.sendWebhook(
+          config.webhook.url,
+          config.webhook.headers,
+          notification,
+        ),
+      );
     }
 
     await Promise.allSettled(promises);
@@ -167,18 +183,25 @@ export class NotificationService {
 
   private async sendSlack(webhookUrl: string, notification: Notification) {
     try {
-      const color = notification.type === 'alert' ? '#FF6B00' : notification.type === 'incident' ? '#ff4444' : '#333333';
+      const color =
+        notification.type === 'alert'
+          ? '#FF6B00'
+          : notification.type === 'incident'
+            ? '#ff4444'
+            : '#333333';
       await fetch(webhookUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          attachments: [{
-            color,
-            title: notification.title,
-            text: notification.message,
-            footer: 'BlackSentinel Nexus',
-            ts: Math.floor(new Date(notification.createdAt).getTime() / 1000),
-          }],
+          attachments: [
+            {
+              color,
+              title: notification.title,
+              text: notification.message,
+              footer: 'BlackSentinel Nexus',
+              ts: Math.floor(new Date(notification.createdAt).getTime() / 1000),
+            },
+          ],
         }),
       });
       this.logger.log(`Slack notification sent: ${notification.id}`);
@@ -187,7 +210,11 @@ export class NotificationService {
     }
   }
 
-  private async sendWebhook(url: string, headers: Record<string, string> | undefined, notification: Notification) {
+  private async sendWebhook(
+    url: string,
+    headers: Record<string, string> | undefined,
+    notification: Notification,
+  ) {
     try {
       await fetch(url, {
         method: 'POST',

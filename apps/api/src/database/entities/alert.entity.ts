@@ -1,7 +1,20 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, Index } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  Index,
+} from 'typeorm';
 
 export type AlertSeverity = 'critical' | 'high' | 'medium' | 'low';
-export type AlertStatus = 'open' | 'acknowledged' | 'investigating' | 'resolved' | 'false_positive' | 'closed';
+export type AlertStatus =
+  | 'open'
+  | 'acknowledged'
+  | 'investigating'
+  | 'resolved'
+  | 'false_positive'
+  | 'closed';
 
 @Entity('alerts')
 @Index(['severity'])
