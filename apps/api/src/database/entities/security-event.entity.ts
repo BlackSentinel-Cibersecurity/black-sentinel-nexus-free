@@ -1,7 +1,22 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, Index } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  Index,
+} from 'typeorm';
 
 export type EventSeverity = 'critical' | 'high' | 'medium' | 'low' | 'info';
-export type EventCategory = 'authentication' | 'network' | 'malware' | 'data_exfiltration' | 'privilege_escalation' | 'policy_violation' | 'system' | 'application' | 'audit';
+export type EventCategory =
+  | 'authentication'
+  | 'network'
+  | 'malware'
+  | 'data_exfiltration'
+  | 'privilege_escalation'
+  | 'policy_violation'
+  | 'system'
+  | 'application'
+  | 'audit';
 
 @Entity('security_events')
 @Index(['timestamp', 'severity'])

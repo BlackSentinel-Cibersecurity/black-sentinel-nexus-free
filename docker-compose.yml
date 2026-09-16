@@ -2,6 +2,7 @@ version: '3.8'
 
 services:
   api:
+    image: ghcr.io/blacksentinel-cibersecurity/black-sentinel-nexus-free/api:latest
     build:
       context: .
       dockerfile: apps/api/Dockerfile
@@ -27,6 +28,7 @@ services:
       start_period: 10s
 
   web:
+    image: ghcr.io/blacksentinel-cibersecurity/black-sentinel-nexus-free/web:latest
     build:
       context: .
       dockerfile: apps/web/Dockerfile

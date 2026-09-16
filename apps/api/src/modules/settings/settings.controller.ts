@@ -1,4 +1,11 @@
-import { Controller, Get, Patch, Body, UseGuards, Request } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Patch,
+  Body,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { SettingsService } from './settings.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -24,13 +31,19 @@ export class SettingsController {
 
   @Patch('language')
   @ApiOperation({ summary: 'Update language' })
-  async updateLanguage(@Request() req: any, @Body() body: { language: string }) {
+  async updateLanguage(
+    @Request() req: any,
+    @Body() body: { language: string },
+  ) {
     return this.settingsService.updateLanguage(req.user.id, body.language);
   }
 
   @Patch('timezone')
   @ApiOperation({ summary: 'Update timezone' })
-  async updateTimezone(@Request() req: any, @Body() body: { timezone: string }) {
+  async updateTimezone(
+    @Request() req: any,
+    @Body() body: { timezone: string },
+  ) {
     return this.settingsService.updateTimezone(req.user.id, body.timezone);
   }
 

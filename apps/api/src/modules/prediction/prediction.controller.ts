@@ -1,5 +1,10 @@
 import { Controller, Get, Post, Body, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { PredictionService } from './prediction.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
@@ -34,7 +39,12 @@ export class PredictionController {
   @Post('generate')
   @ApiOperation({ summary: 'Generate custom prediction' })
   @ApiResponse({ status: 200, description: 'Prediction generated' })
-  async generatePrediction(@Body() body: { type: string; parameters: Record<string, unknown> }) {
-    return this.predictionService.generatePrediction(body.type, body.parameters);
+  async generatePrediction(
+    @Body() body: { type: string; parameters: Record<string, unknown> },
+  ) {
+    return this.predictionService.generatePrediction(
+      body.type,
+      body.parameters,
+    );
   }
 }

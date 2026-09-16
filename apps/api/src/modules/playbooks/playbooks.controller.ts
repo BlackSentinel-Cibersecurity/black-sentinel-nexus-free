@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Patch, Delete, Param, Body, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Delete,
+  Param,
+  Body,
+  UseGuards,
+} from '@nestjs/common';
 import { PlaybooksService } from './playbooks.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
@@ -8,16 +17,24 @@ export class PlaybooksController {
   constructor(private readonly playbooksService: PlaybooksService) {}
 
   @Get()
-  findAll() { return this.playbooksService.findAll(); }
+  findAll() {
+    return this.playbooksService.findAll();
+  }
 
   @Get('stats')
-  getStats() { return this.playbooksService.getStats(); }
+  getStats() {
+    return this.playbooksService.getStats();
+  }
 
   @Get(':id')
-  findOne(@Param('id') id: string) { return this.playbooksService.findById(id); }
+  findOne(@Param('id') id: string) {
+    return this.playbooksService.findById(id);
+  }
 
   @Post()
-  create(@Body() body: any) { return this.playbooksService.create(body); }
+  create(@Body() body: any) {
+    return this.playbooksService.create(body);
+  }
 
   @Post(':id/execute')
   execute(@Param('id') id: string, @Body() body?: { triggeredBy?: any }) {
@@ -25,8 +42,12 @@ export class PlaybooksController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() body: any) { return this.playbooksService.update(id, body); }
+  update(@Param('id') id: string, @Body() body: any) {
+    return this.playbooksService.update(id, body);
+  }
 
   @Delete(':id')
-  delete(@Param('id') id: string) { return this.playbooksService.delete(id); }
+  delete(@Param('id') id: string) {
+    return this.playbooksService.delete(id);
+  }
 }

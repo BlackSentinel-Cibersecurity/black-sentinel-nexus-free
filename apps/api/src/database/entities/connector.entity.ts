@@ -1,8 +1,30 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
-export type ConnectorType = 'syslog' | 'wec' | 'api' | 'agent' | 'cloud' | 'webhook' | 'custom';
+export type ConnectorType =
+  'syslog' | 'wec' | 'api' | 'agent' | 'cloud' | 'webhook' | 'custom';
 export type ConnectorStatus = 'active' | 'inactive' | 'error' | 'configuring';
-export type ConnectorCategory = 'cloud' | 'siem' | 'edr' | 'network' | 'identity' | 'vulnerability' | 'threat_intel' | 'ticketing' | 'collaboration' | 'email' | 'database' | 'devops' | 'endpoint' | 'compliance' | 'custom';
+export type ConnectorCategory =
+  | 'cloud'
+  | 'siem'
+  | 'edr'
+  | 'network'
+  | 'identity'
+  | 'vulnerability'
+  | 'threat_intel'
+  | 'ticketing'
+  | 'collaboration'
+  | 'email'
+  | 'database'
+  | 'devops'
+  | 'endpoint'
+  | 'compliance'
+  | 'custom';
 
 @Entity('connectors')
 export class Connector {

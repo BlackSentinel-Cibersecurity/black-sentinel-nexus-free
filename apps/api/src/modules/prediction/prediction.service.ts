@@ -4,7 +4,6 @@ import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class PredictionService {
-
   async getAttackPredictions(): Promise<PredictionResult[]> {
     return [
       {
@@ -12,7 +11,8 @@ export class PredictionService {
         type: 'attack_prediction',
         probability: 0.82,
         timeWindow: '72 hours',
-        description: '82% probability of ransomware attempt on production servers based on detected reconnaissance patterns.',
+        description:
+          '82% probability of ransomware attempt on production servers based on detected reconnaissance patterns.',
         factors: [
           'Intensive port scanning from external IP',
           'SMB share access attempts',
@@ -34,7 +34,8 @@ export class PredictionService {
         type: 'attack_prediction',
         probability: 0.67,
         timeWindow: '48 hours',
-        description: 'Possible targeted phishing attempt on finance department based on active campaigns detected.',
+        description:
+          'Possible targeted phishing attempt on finance department based on active campaigns detected.',
         factors: [
           'Active phishing campaigns in financial sector',
           'Finance employees as frequent target',
@@ -59,7 +60,8 @@ export class PredictionService {
         type: 'risk_trend',
         probability: 0.65,
         timeWindow: '7 days',
-        description: 'Overall organizational risk will increase 15% in the next 7 days due to accumulated vulnerabilities.',
+        description:
+          'Overall organizational risk will increase 15% in the next 7 days due to accumulated vulnerabilities.',
         factors: [
           'Accumulated pending patches',
           'Critical services exposure',
@@ -82,7 +84,8 @@ export class PredictionService {
         id: uuidv4(),
         type: 'behavioral_anomaly',
         severity: 'high',
-        description: 'Admin user downloaded 2.5GB of data outside business hours',
+        description:
+          'Admin user downloaded 2.5GB of data outside business hours',
         user: 'admin@company.com',
         timestamp: new Date(Date.now() - 7200000),
         riskScore: 78,
@@ -101,7 +104,8 @@ export class PredictionService {
         id: uuidv4(),
         type: 'process_anomaly',
         severity: 'critical',
-        description: 'PowerShell executing external download with Base64 encoding',
+        description:
+          'PowerShell executing external download with Base64 encoding',
         host: 'WS-FINANCE-01',
         process: 'powershell.exe',
         timestamp: new Date(Date.now() - 3600000),
@@ -119,7 +123,7 @@ export class PredictionService {
       description: `Prediction generated for ${type} with custom parameters`,
       factors: ['Factor 1', 'Factor 2', 'Factor 3'],
       recommendations: ['Recommendation 1', 'Recommendation 2'],
-      confidence: 0.50,
+      confidence: 0.5,
       createdAt: new Date(),
       modelVersion: '1.0.0',
       trainingData: 'Last updated: ' + new Date().toISOString(),

@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Patch, Delete, Body, Param, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Delete,
+  Body,
+  Param,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -30,26 +39,48 @@ export class UsersController {
 
   @Post()
   @ApiOperation({ summary: 'Create a new user' })
-  async create(@Body() body: { email: string; name: string; password: string; role?: string }) {
+  async create(
+    @Body()
+    body: {
+      email: string;
+      name: string;
+      password: string;
+      role?: string;
+    },
+  ) {
     return this.usersService.create({ ...body, role: body.role as any });
   }
 
   @Patch(':id')
   @ApiOperation({ summary: 'Update a user' })
-  async update(@Param('id') id: string, @Body() body: { name?: string; email?: string; role?: string; isActive?: boolean }) {
+  async update(
+    @Param('id') id: string,
+    @Body()
+    body: { name?: string; email?: string; role?: string; isActive?: boolean },
+  ) {
     return this.usersService.update(id, { ...body, role: body.role as any });
   }
 
   @Patch(':id/password')
   @ApiOperation({ summary: 'Change user password' })
-  async changePassword(@Param('id') id: string, @Body() body: { currentPassword: string; newPassword: string }) {
-    await this.usersService.changePassword(id, body.currentPassword, body.newPassword);
+  async changePassword(
+    @Param('id') id: string,
+    @Body() body: { currentPassword: string; newPassword: string },
+  ) {
+    await this.usersService.changePassword(
+      id,
+      body.currentPassword,
+      body.newPassword,
+    );
     return { message: 'Password changed successfully' };
   }
 
   @Patch(':id/reset-password')
   @ApiOperation({ summary: 'Reset user password (admin)' })
-  async resetPassword(@Param('id') id: string, @Body() body: { newPassword: string }) {
+  async resetPassword(
+    @Param('id') id: string,
+    @Body() body: { newPassword: string },
+  ) {
     await this.usersService.resetPassword(id, body.newPassword);
     return { message: 'Password reset successfully' };
   }

@@ -1,7 +1,25 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, Index } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  Index,
+} from 'typeorm';
 
-export type AssetType = 'server' | 'workstation' | 'firewall' | 'router' | 'switch' | 'database' | 'cloud' | 'endpoint' | 'network' | 'container';
-export type AssetStatus = 'active' | 'warning' | 'critical' | 'offline' | 'decommissioned';
+export type AssetType =
+  | 'server'
+  | 'workstation'
+  | 'firewall'
+  | 'router'
+  | 'switch'
+  | 'database'
+  | 'cloud'
+  | 'endpoint'
+  | 'network'
+  | 'container';
+export type AssetStatus =
+  'active' | 'warning' | 'critical' | 'offline' | 'decommissioned';
 
 @Entity('assets')
 @Index(['type'])

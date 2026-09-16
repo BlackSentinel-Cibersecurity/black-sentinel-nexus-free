@@ -1,7 +1,22 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, Index } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  Index,
+} from 'typeorm';
 
-export type IOCType = 'ip' | 'domain' | 'url' | 'hash_md5' | 'hash_sha1' | 'hash_sha256' | 'email' | 'file_path';
-export type ThreatType = 'ioc' | 'apt' | 'malware' | 'vulnerability' | 'campaign' | 'tool';
+export type IOCType =
+  | 'ip'
+  | 'domain'
+  | 'url'
+  | 'hash_md5'
+  | 'hash_sha1'
+  | 'hash_sha256'
+  | 'email'
+  | 'file_path';
+export type ThreatType =
+  'ioc' | 'apt' | 'malware' | 'vulnerability' | 'campaign' | 'tool';
 
 @Entity('threat_indicators')
 @Index(['type'])

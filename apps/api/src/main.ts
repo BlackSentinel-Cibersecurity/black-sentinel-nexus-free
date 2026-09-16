@@ -12,10 +12,12 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
 
   // Security middleware
-  app.use(helmet({
-    contentSecurityPolicy: false,
-    crossOriginEmbedderPolicy: false,
-  }));
+  app.use(
+    helmet({
+      contentSecurityPolicy: false,
+      crossOriginEmbedderPolicy: false,
+    }),
+  );
   app.use(compression());
 
   // Global prefix
@@ -24,9 +26,9 @@ async function bootstrap() {
   // Health endpoint (outside global prefix)
   const httpAdapter = app.getHttpAdapter();
   httpAdapter.get('/api/v1/health', (_req: any, res: any) => {
-    res.json({ 
-      status: 'ok', 
-      timestamp: new Date().toISOString(), 
+    res.json({
+      status: 'ok',
+      timestamp: new Date().toISOString(),
       version: '1.0.0-free',
       edition: 'free',
       limits: {
@@ -34,7 +36,7 @@ async function bootstrap() {
         maxConnectors: 10,
         maxCorrelationRules: 2,
         languages: ['en', 'es'],
-      }
+      },
     });
   });
 
@@ -60,7 +62,9 @@ async function bootstrap() {
   // Swagger documentation
   const config = new DocumentBuilder()
     .setTitle('BlackSentinel Nexus API [FREE Edition]')
-    .setDescription('Next-Generation Security Operations Platform API - Free Edition with limited features')
+    .setDescription(
+      'Next-Generation Security Operations Platform API - Free Edition with limited features',
+    )
     .setVersion('1.0-free')
     .addBearerAuth()
     .addTag('auth', 'Authentication endpoints')
@@ -83,7 +87,9 @@ async function bootstrap() {
   const port = configService.get('PORT', 3001);
   await app.listen(port);
 
-  logger.log(`BlackSentinel Nexus API [FREE Edition] running on http://localhost:${port}`);
+  logger.log(
+    `BlackSentinel Nexus API [FREE Edition] running on http://localhost:${port}`,
+  );
   logger.log(`API docs at http://localhost:${port}/docs`);
   logger.log(`Environment: ${configService.get('NODE_ENV', 'development')}`);
   logger.log(`Limits: 3 users, 10 connectors, 2 correlation rules, EN/ES only`);

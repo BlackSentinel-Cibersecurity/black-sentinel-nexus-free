@@ -1,4 +1,9 @@
-import { Injectable, UnauthorizedException, ConflictException, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  ConflictException,
+  Logger,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
@@ -19,21 +24,32 @@ export class AuthService {
   }
 
   private async seedAdmin() {
-    const exists = await this.userRepo.findOne({ where: { email: 'admin@blacksentinel.io' } });
+    const exists = await this.userRepo.findOne({
+      where: { email: 'admin@blacksentinel.io' },
+    });
     if (!exists) {
       const hash = await bcrypt.hash('Admin@123', 10);
-      await this.userRepo.save(this.userRepo.create({
-        email: 'admin@blacksentinel.io',
-        name: 'Admin',
-        password: hash,
-        role: 'admin',
-      }));
+      await this.userRepo.save(
+        this.userRepo.create({
+          email: 'admin@blacksentinel.io',
+          name: 'Admin',
+          password: hash,
+          role: 'admin',
+        }),
+      );
       this.logger.log('Admin user seeded: admin@blacksentinel.io');
     }
   }
 
-  async login(email: string, password: string, ip?: string): Promise<{ access_token: string; user: any }> {
-    const user = await this.userRepo.findOne({ where: { email }, select: ['id', 'email', 'name', 'password', 'role', 'isActive'] });
+  async login(
+    email: string,
+    password: string,
+    ip?: string,
+  ): Promise<{ access_token: string; user: any }> {
+    const user = await this.userRepo.findOne({
+      where: { email },
+      select: ['id', 'email', 'name', 'password', 'role', 'isActive'],
+    });
     if (!user) throw new UnauthorizedException('Invalid credentials');
     if (!user.isActive) throw new UnauthorizedException('Account is disabled');
 
@@ -54,23 +70,43 @@ export class AuthService {
     const payload = { sub: user.id, email: user.email, role: user.role };
     return {
       access_token: this.jwtService.sign(payload),
-      user: { id: user.id, email: user.email, name: user.name, role: user.role },
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+      },
     };
   }
 
-  async register(email: string, name: string, password: string, role?: string): Promise<{ access_token: string; user: any }> {
+  async register(
+    email: string,
+    name: string,
+    password: string,
+    role?: string,
+  ): Promise<{ access_token: string; user: any }> {
     const exists = await this.userRepo.findOne({ where: { email } });
     if (exists) throw new ConflictException('Email already registered');
 
     const hash = await bcrypt.hash(password, 10);
-    const user = await this.userRepo.save(this.userRepo.create({
-      email, name, password: hash, role: (role as any) || 'analyst',
-    }));
+    const user = await this.userRepo.save(
+      this.userRepo.create({
+        email,
+        name,
+        password: hash,
+        role: (role as any) || 'analyst',
+      }),
+    );
 
     const payload = { sub: user.id, email: user.email, role: user.role };
     return {
       access_token: this.jwtService.sign(payload),
-      user: { id: user.id, email: user.email, name: user.name, role: user.role },
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+      },
     };
   }
 

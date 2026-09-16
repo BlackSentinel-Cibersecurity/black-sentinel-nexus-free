@@ -23,9 +23,11 @@ export class CorrelationEngine {
   private rules: CorrelationRule[] = [];
 
   constructor(
-    @InjectRepository(SecurityEvent) private eventRepo: Repository<SecurityEvent>,
+    @InjectRepository(SecurityEvent)
+    private eventRepo: Repository<SecurityEvent>,
     @InjectRepository(Alert) private alertRepo: Repository<Alert>,
-    @InjectRepository(CorrelationRule) private ruleRepo: Repository<CorrelationRule>,
+    @InjectRepository(CorrelationRule)
+    private ruleRepo: Repository<CorrelationRule>,
     private wsGateway: EventsGateway,
   ) {
     this.loadRules();
@@ -45,15 +47,28 @@ export class CorrelationEngine {
     const defaults = [
       {
         name: 'Brute Force Detection',
-        description: 'Multiple failed login attempts from same IP within 5 minutes',
+        description:
+          'Multiple failed login attempts from same IP within 5 minutes',
         severity: 'high',
-        conditions: { eventCount: 5, timeWindowMinutes: 5, category: 'authentication', sameSource: true } as CorrelationCondition,
+        conditions: {
+          eventCount: 5,
+          timeWindowMinutes: 5,
+          category: 'authentication',
+          sameSource: true,
+        } as CorrelationCondition,
       },
       {
         name: 'Port Scan Detection',
-        description: 'Multiple connection attempts to different ports from same source',
+        description:
+          'Multiple connection attempts to different ports from same source',
         severity: 'medium',
-        conditions: { eventCount: 10, timeWindowMinutes: 2, category: 'network', sameSource: true, uniqueCount: 'destinationPort' } as CorrelationCondition,
+        conditions: {
+          eventCount: 10,
+          timeWindowMinutes: 2,
+          category: 'network',
+          sameSource: true,
+          uniqueCount: 'destinationPort',
+        } as CorrelationCondition,
       },
     ];
 
@@ -81,12 +96,16 @@ export class CorrelationEngine {
     return generatedAlerts;
   }
 
-  private async evaluateRule(rule: CorrelationRule, event: SecurityEvent): Promise<boolean> {
+  private async evaluateRule(
+    rule: CorrelationRule,
+    event: SecurityEvent,
+  ): Promise<boolean> {
     const cond = rule.conditions as CorrelationCondition;
     const windowMs = (cond.timeWindowMinutes || 5) * 60 * 1000;
     const windowStart = new Date(Date.now() - windowMs);
 
-    const qb = this.eventRepo.createQueryBuilder('e')
+    const qb = this.eventRepo
+      .createQueryBuilder('e')
       .where('e.timestamp >= :windowStart', { windowStart });
 
     if (cond.category) {
@@ -102,7 +121,9 @@ export class CorrelationEngine {
     }
 
     if (cond.sameDestination && event.destinationIp) {
-      qb.andWhere('e.destinationIp = :destinationIp', { destinationIp: event.destinationIp });
+      qb.andWhere('e.destinationIp = :destinationIp', {
+        destinationIp: event.destinationIp,
+      });
     }
 
     const count = await qb.getCount();
@@ -117,7 +138,10 @@ export class CorrelationEngine {
     return false;
   }
 
-  private async createAlertFromRule(rule: CorrelationRule, event: SecurityEvent): Promise<Alert> {
+  private async createAlertFromRule(
+    rule: CorrelationRule,
+    event: SecurityEvent,
+  ): Promise<Alert> {
     const existingAlert = await this.alertRepo.findOne({
       where: {
         ruleId: rule.id,
@@ -172,7 +196,12 @@ export class CorrelationEngine {
       .groupBy('a.severity')
       .getRawMany();
 
-    const counts: Record<string, number> = { critical: 0, high: 0, medium: 0, low: 0 };
+    const counts: Record<string, number> = {
+      critical: 0,
+      high: 0,
+      medium: 0,
+      low: 0,
+    };
     for (const row of result) {
       counts[row.severity] = parseInt(row.count, 10);
     }

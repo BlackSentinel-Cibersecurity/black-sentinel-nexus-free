@@ -1,7 +1,9 @@
 FROM node:20-alpine AS base
 
-# Install pnpm
-RUN npm install -g pnpm
+# Install pnpm (pinned to match the "packageManager" field in package.json,
+# otherwise pnpm's self-management tries to fetch a native @pnpm/exe binary
+# for the pinned version, which isn't published for linux-arm64-musl)
+RUN npm install -g pnpm@9.0.0
 
 # Build stage
 FROM base AS builder

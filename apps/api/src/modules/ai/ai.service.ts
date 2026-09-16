@@ -1,5 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { AIAnalysisRequest, AIAnalysisResponse, QueryTranslation, PredictionResult } from '@bsn/types';
+import {
+  AIAnalysisRequest,
+  AIAnalysisResponse,
+  QueryTranslation,
+  PredictionResult,
+} from '@bsn/types';
 import { v4 as uuidv4 } from 'uuid';
 import OpenAI from 'openai';
 
@@ -43,9 +48,11 @@ export class AIService {
     }
   }
 
-  private async generateIncidentSummary(request: AIAnalysisRequest): Promise<AIAnalysisResponse> {
+  private async generateIncidentSummary(
+    request: AIAnalysisRequest,
+  ): Promise<AIAnalysisResponse> {
     const { input } = request;
-    
+
     return {
       result: `## Resumen del Incidente
 
@@ -74,7 +81,11 @@ El incidente detectado involucra actividad sospechosa que compromete la integrid
 3. Activar el playbook de respuesta a incidentes
 4. Notificar al equipo de seguridad`,
       confidence: 0.92,
-      sources: ['Análisis de logs del SIEM', 'Threat Intelligence feeds', 'MITRE ATT&CK framework'],
+      sources: [
+        'Análisis de logs del SIEM',
+        'Threat Intelligence feeds',
+        'MITRE ATT&CK framework',
+      ],
       recommendations: [
         'Aislar inmediatamente los endpoints comprometidos',
         'Ejecutar análisis forense completo',
@@ -84,7 +95,9 @@ El incidente detectado involucra actividad sospechosa que compromete la integrid
     };
   }
 
-  private async generateRiskAssessment(_request: AIAnalysisRequest): Promise<AIAnalysisResponse> {
+  private async generateRiskAssessment(
+    _request: AIAnalysisRequest,
+  ): Promise<AIAnalysisResponse> {
     return {
       result: `## Evaluación de Riesgo
 
@@ -118,7 +131,9 @@ El incidente detectado involucra actividad sospechosa que compromete la integrid
     };
   }
 
-  private async analyzeThreat(_request: AIAnalysisRequest): Promise<AIAnalysisResponse> {
+  private async analyzeThreat(
+    _request: AIAnalysisRequest,
+  ): Promise<AIAnalysisResponse> {
     return {
       result: `## Análisis de Amenaza
 
@@ -149,7 +164,9 @@ Esta campaña ha sido observada targeting organizaciones del sector financiero. 
     };
   }
 
-  private async explainVulnerability(request: AIAnalysisRequest): Promise<AIAnalysisResponse> {
+  private async explainVulnerability(
+    request: AIAnalysisRequest,
+  ): Promise<AIAnalysisResponse> {
     return {
       result: `## Explicación de Vulnerabilidad
 
@@ -181,7 +198,9 @@ El atacante puede obtener acceso remoto sin autenticación ejecutando comandos c
     };
   }
 
-  private async processNaturalLanguageQuery(request: AIAnalysisRequest): Promise<AIAnalysisResponse> {
+  private async processNaturalLanguageQuery(
+    request: AIAnalysisRequest,
+  ): Promise<AIAnalysisResponse> {
     if (this.openai) {
       try {
         const completion = await this.openai.chat.completions.create({
@@ -199,10 +218,12 @@ Formato: usa markdown, listas y tablas cuando sea útil.`,
           max_tokens: 1500,
         });
 
-        const content = completion.choices[0]?.message?.content || 'No se pudo generar respuesta';
+        const content =
+          completion.choices[0]?.message?.content ||
+          'No se pudo generar respuesta';
         return {
           result: content,
-          confidence: 0.90,
+          confidence: 0.9,
           sources: ['OpenAI GPT-4', 'Contexto del SIEM'],
           recommendations: ['Verificar los hallazgos con fuentes adicionales'],
         };
@@ -215,20 +236,24 @@ Formato: usa markdown, listas y tablas cuando sea útil.`,
     return this.getMockResponse(request);
   }
 
-  private getMockResponse(request: AIAnalysisRequest): Promise<AIAnalysisResponse> {
+  private getMockResponse(
+    request: AIAnalysisRequest,
+  ): Promise<AIAnalysisResponse> {
     const query = request.input.toLowerCase();
 
     if (query.includes('servidor') && query.includes('vulner')) {
       return Promise.resolve({
-        result: 'He encontrado 12 servidores con vulnerabilidades críticas activas. Los más urgentes son:\n\n1. **WEB-PROD-01** - CVE-2024-3094 (CVSS 10.0)\n2. **DB-PRIMARY** - CVE-2024-21762 (CVSS 9.8)\n3. **API-GW-02** - CVE-2024-38077 (CVSS 9.1)\n\n¿Deseas que genere un plan de remediación priorizado?',
-        confidence: 0.90,
+        result:
+          'He encontrado 12 servidores con vulnerabilidades críticas activas. Los más urgentes son:\n\n1. **WEB-PROD-01** - CVE-2024-3094 (CVSS 10.0)\n2. **DB-PRIMARY** - CVE-2024-21762 (CVSS 9.8)\n3. **API-GW-02** - CVE-2024-38077 (CVSS 9.1)\n\n¿Deseas que genere un plan de remediación priorizado?',
+        confidence: 0.9,
         recommendations: ['Priorizar WEB-PROD-01 por exposición pública'],
       });
     }
 
     if (query.includes('aislar') && query.includes('endpoint')) {
       return Promise.resolve({
-        result: 'Entendido. Voy a ejecutar el playbook de aislamiento de endpoint. Esto:\n\n1. Desactivará la tarjeta de red en el endpoint afectado\n2. Creará regla de firewall temporal\n3. Notificará al equipo de SOC\n4. Generará evidencia forense\n\n¿Confirmas la ejecución?',
+        result:
+          'Entendido. Voy a ejecutar el playbook de aislamiento de endpoint. Esto:\n\n1. Desactivará la tarjeta de red en el endpoint afectado\n2. Creará regla de firewall temporal\n3. Notificará al equipo de SOC\n4. Generará evidencia forense\n\n¿Confirmas la ejecución?',
         confidence: 0.95,
         recommendations: ['Confirmar antes de ejecutar aislamiento'],
       });
@@ -240,7 +265,9 @@ Formato: usa markdown, listas y tablas cuando sea útil.`,
     });
   }
 
-  private async generateRule(_request: AIAnalysisRequest): Promise<AIAnalysisResponse> {
+  private async generateRule(
+    _request: AIAnalysisRequest,
+  ): Promise<AIAnalysisResponse> {
     return {
       result: `## Regla Sigma Generada
 
@@ -277,11 +304,16 @@ falsepositives:
 ### Análisis
 Esta regla detecta la ejecución de PowerShell con comandos codificados, una técnica comúnmente utilizada por atacantes para evadir detección. La confianza en esta detección es alta (92%).`,
       confidence: 0.92,
-      recommendations: ['Probar la regla en entorno de staging primero', 'Ajustar falsos positivos según el entorno'],
+      recommendations: [
+        'Probar la regla en entorno de staging primero',
+        'Ajustar falsos positivos según el entorno',
+      ],
     };
   }
 
-  private async generatePlaybook(_request: AIAnalysisRequest): Promise<AIAnalysisResponse> {
+  private async generatePlaybook(
+    _request: AIAnalysisRequest,
+  ): Promise<AIAnalysisResponse> {
     return {
       result: `## Playbook Generado
 
@@ -326,7 +358,9 @@ Esta regla detecta la ejecución de PowerShell con comandos codificados, una té
     };
   }
 
-  private async generateExecutiveSummary(_request: AIAnalysisRequest): Promise<AIAnalysisResponse> {
+  private async generateExecutiveSummary(
+    _request: AIAnalysisRequest,
+  ): Promise<AIAnalysisResponse> {
     return {
       result: `## Resumen Ejecutivo - Seguridad
 
@@ -355,11 +389,14 @@ Esta regla detecta la ejecución de PowerShell con comandos codificados, una té
 2. Contratar 2 analistas SOC adicionales
 3. Invertir en automatización de SOAR
 4. Realizar ejercicio de tabletop trimestral`,
-      confidence: 0.90,
+      confidence: 0.9,
     };
   }
 
-  async translateQuery(query: string, targetLanguage: string): Promise<QueryTranslation> {
+  async translateQuery(
+    query: string,
+    targetLanguage: string,
+  ): Promise<QueryTranslation> {
     const translations: Record<string, string> = {
       kql: `SecurityEvent
 | where TimeGenerated >= ago(24h)
@@ -396,7 +433,8 @@ ORDER BY failed_attempts DESC`,
         type: 'attack_prediction',
         probability: 0.82,
         timeWindow: '72 horas',
-        description: 'Existe un 82% de probabilidad de intento de ransomware en los servidores de producción basado en patrones de reconocimiento detectados.',
+        description:
+          'Existe un 82% de probabilidad de intento de ransomware en los servidores de producción basado en patrones de reconocimiento detectados.',
         factors: [
           'Escaneo de puertos intensivo desde IP externa',
           'Intentos de acceso a shares SMB',
@@ -418,7 +456,8 @@ ORDER BY failed_attempts DESC`,
         type: 'risk_trend',
         probability: 0.65,
         timeWindow: '7 días',
-        description: 'El riesgo general de la organización aumentará un 15% en los próximos 7 días debido a vulnerabilidades acumuladas.',
+        description:
+          'El riesgo general de la organización aumentará un 15% en los próximos 7 días debido a vulnerabilidades acumuladas.',
         factors: [
           'Acumulación de parches pendientes',
           'Exposición de servicios críticos',

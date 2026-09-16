@@ -37,10 +37,12 @@ import { SettingsModule } from './modules/settings/settings.module';
     DatabaseModule,
 
     // Rate limiting
-    ThrottlerModule.forRoot([{
-      ttl: 60000,
-      limit: 100,
-    }]),
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60000,
+        limit: 100,
+      },
+    ]),
 
     // Scheduling
     ScheduleModule.forRoot(),
