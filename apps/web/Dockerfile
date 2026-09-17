@@ -10,7 +10,7 @@ FROM base AS builder
 WORKDIR /app
 
 # Copy package files
-COPY package.json pnpm-lock.yaml ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/web/package.json ./apps/web/
 COPY packages/types/package.json ./packages/types/
 COPY packages/ui/package.json ./packages/ui/
@@ -36,14 +36,16 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 
-# Copy built files
-COPY --from=builder /app/apps/web/.next ./.next
-COPY --from=builder /app/apps/web/node_modules ./node_modules
-COPY --from=builder /app/apps/web/package.json ./
-COPY --from=builder /app/apps/web/public ./public
+# next.config.js sets output: 'standalone', which traces only the
+# dependencies actually used and copies them as real files (not the
+# pnpm-symlinked workspace node_modules, which don't resolve once
+# apps/web/node_modules is copied out on its own).
+COPY --from=builder /app/apps/web/.next/standalone ./
+COPY --from=builder /app/apps/web/.next/static ./apps/web/.next/static
+COPY --from=builder /app/apps/web/public ./apps/web/public
 
 # Expose port
 EXPOSE 3000
 
-# Start the server
-CMD ["npm", "start"]
+# Start the standalone server
+CMD ["node", "apps/web/server.js"]
