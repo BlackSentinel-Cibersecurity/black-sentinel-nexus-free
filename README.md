@@ -87,7 +87,7 @@ pnpm dev
 
 ### Default Credentials
 
-- **Email**: admin@blacksentinel.io
+- **Email**: BlackSentinel-tech@protonmail.com
 - **Password**: Admin@123
 
 ---
@@ -259,7 +259,7 @@ Copy `.env.example` to `apps/api/.env` and configure:
 
 ## Enterprise Features
 
-For full capabilities, contact sales@blacksentinel.io:
+For full capabilities, contact BlackSentinel-tech@protonmail.com:
 
 - Unlimited users
 - 64 connector templates
@@ -276,8 +276,21 @@ For full capabilities, contact sales@blacksentinel.io:
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup and guidelines.
 
+---
+
+## Before you run it
+
+- This is a **technical preview** and the open-source edition of the product. It comes with no warranty and no service-level commitment: try it in a test environment first.
+- It is **self-hosted**. BlackSentinel does not host it for you, and paid plans are not on sale.
+- Change every default credential and secret before exposing anything to a network. Never deploy with the example values from `.env.example` or `.env.production`.
+- Use it only on systems you own or are explicitly authorized to test or monitor. See the [Acceptable Use Policy](https://blacksentinel.tech/acceptable-use/).
+
+## Support
+
+- Bugs and questions: [open an issue](https://github.com/BlackSentinel-Cibersecurity/black-sentinel-nexus-free/issues) in this repository.
+- Security reports: follow [security.txt](https://blacksentinel.tech/.well-known/security.txt). Please do not open a public issue for a vulnerability.
+- Everything else: BlackSentinel-tech@protonmail.com
+
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-Copyright (c) 2026 BlackSentinel
+MIT. See [LICENSE](LICENSE). The BlackSentinel name and logo are not covered by the licence.
