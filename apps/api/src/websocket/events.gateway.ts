@@ -11,6 +11,7 @@ import { Server, Socket } from 'socket.io';
 import { Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
+import { jwtSecret } from '../common/jwt-secret';
 
 @WebSocketGateway({
   cors: { origin: true },
@@ -54,9 +55,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     try {
-      const payload = this.jwtService.verify(token, {
-        secret: this.configService.get<string>('JWT_SECRET'),
-      });
+      const payload = this.jwtService.verify(token, { secret: jwtSecret() });
       const userId = payload.sub;
 
       this.connectedClients.set(client.id, { userId, rooms: new Set() });

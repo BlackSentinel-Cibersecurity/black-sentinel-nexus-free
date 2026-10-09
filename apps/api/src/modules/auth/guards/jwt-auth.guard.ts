@@ -1,6 +1,8 @@
 import {
   Injectable,
+  CanActivate,
   ExecutionContext,
+  ForbiddenException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
@@ -42,5 +44,20 @@ export class RolesGuard {
     }
 
     return this.allowedRoles.includes(user.role);
+  }
+}
+
+/**
+ * Lets a request through only for an admin. Use after JwtAuthGuard, which puts
+ * the verified { id, email, role } on request.user.
+ */
+@Injectable()
+export class AdminGuard implements CanActivate {
+  canActivate(context: ExecutionContext): boolean {
+    const user = context.switchToHttp().getRequest().user;
+    if (user?.role !== 'admin') {
+      throw new ForbiddenException('Only an admin can do this');
+    }
+    return true;
   }
 }

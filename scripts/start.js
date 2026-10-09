@@ -114,7 +114,7 @@ async function main() {
   log('  API:    http://localhost:3001');
   log('  Docs:   http://localhost:3001/docs');
   log('  Health: http://localhost:3001/api/v1/health\n');
-  log('  Login:  admin@blacksentinel.io / Admin@123\n');
+  log('  Login:  admin@blacksentinel.io / the password printed in the API log on first start\n');
   log('  Press Ctrl+C to stop\n');
 
   // Handle shutdown

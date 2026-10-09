@@ -32,6 +32,7 @@ Works on all platforms with Docker installed.
 ```bash
 git clone https://github.com/BlackSentinel-Cibersecurity/black-sentinel-nexus-free.git
 cd black-sentinel-nexus-free
+./scripts/init-env.sh      # random JWT secret + first-admin password in .env
 docker-compose up -d
 ```
 
@@ -85,10 +86,12 @@ pnpm dev
 | API Docs | http://localhost:3001/docs |
 | Health Check | http://localhost:3001/api/v1/health |
 
-### Default Credentials
+### First Sign-in
 
-- **Email**: BlackSentinel-tech@protonmail.com
-- **Password**: Admin@123
+- **Email**: `admin@blacksentinel.io`
+- **Password**: the `ADMIN_PASSWORD` in your `.env` (created by `./scripts/init-env.sh`). If you did not set one, the API creates a random password on first start and prints it **once** in its log (`docker compose logs api`).
+
+There is no published default password. Change it under Settings after you sign in.
 
 ---
 
