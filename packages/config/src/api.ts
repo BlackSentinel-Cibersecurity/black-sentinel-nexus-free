@@ -3,7 +3,8 @@ const apiConfig = {
   host: process.env.API_HOST || '0.0.0.0',
   corsOrigin: process.env.CORS_ORIGIN || 'http://localhost:3000',
   jwt: {
-    secret: process.env.JWT_SECRET || 'change-this-to-a-secure-random-string',
+    // No built-in fallback: see apps/api/src/common/jwt-secret.ts.
+    secret: process.env.JWT_SECRET || '',
     expiresIn: process.env.JWT_EXPIRES_IN || '24h',
   },
   rateLimit: {

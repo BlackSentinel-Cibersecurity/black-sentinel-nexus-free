@@ -7,13 +7,14 @@ import { AuthController } from './auth.controller';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { User } from '../../database/entities/user.entity';
 import { AuditModule } from '../audit/audit.module';
+import { jwtSecret } from '../../common/jwt-secret';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([User]),
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({
-      secret: process.env.JWT_SECRET || 'blacksentinel-nexus-secret-key-2024',
+      secret: jwtSecret(),
       signOptions: { expiresIn: '24h' },
     }),
     AuditModule,
