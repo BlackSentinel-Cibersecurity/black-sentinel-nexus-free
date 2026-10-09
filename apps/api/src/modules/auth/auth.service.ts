@@ -8,6 +8,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
+import { randomBytes } from 'crypto';
 import { User } from '../../database/entities/user.entity';
 import { AuditService } from '../audit/audit.service';
 
@@ -23,21 +24,34 @@ export class AuthService {
     this.seedAdmin();
   }
 
+  // SECURITY FIX: the first admin used to be seeded with the published
+  // password 'Admin@123'. It now takes ADMIN_PASSWORD (12+ characters) or, when
+  // that is not set, a random password printed once in this log on first start.
   private async seedAdmin() {
-    const exists = await this.userRepo.findOne({
-      where: { email: 'admin@blacksentinel.io' },
-    });
-    if (!exists) {
-      const hash = await bcrypt.hash('Admin@123', 10);
-      await this.userRepo.save(
-        this.userRepo.create({
-          email: 'admin@blacksentinel.io',
-          name: 'Admin',
-          password: hash,
-          role: 'admin',
-        }),
+    const email = process.env.ADMIN_EMAIL?.trim() || 'admin@blacksentinel.io';
+    const exists = await this.userRepo.findOne({ where: { email } });
+    if (exists) return;
+    const configured = process.env.ADMIN_PASSWORD?.trim();
+    const password =
+      configured && configured.length >= 12
+        ? configured
+        : randomBytes(12).toString('base64url');
+    await this.userRepo.save(
+      this.userRepo.create({
+        email,
+        name: 'Admin',
+        password: await bcrypt.hash(password, 10),
+        role: 'admin',
+      }),
+    );
+    if (configured && configured.length >= 12) {
+      this.logger.log(
+        `Admin user created: ${email} (password from ADMIN_PASSWORD)`,
       );
-      this.logger.log('Admin user seeded: admin@blacksentinel.io');
+    } else {
+      this.logger.warn(
+        `Admin user created: ${email} / ${password}  <- shown only this once; sign in and change it under Settings.`,
+      );
     }
   }
 
@@ -79,14 +93,18 @@ export class AuthService {
     };
   }
 
+  // SECURITY FIX: self-registration used to accept a `role` from the request
+  // body, so anyone who could reach the API could sign up as an admin. New
+  // accounts are always analysts; an admin promotes them under Users.
   async register(
     email: string,
     name: string,
     password: string,
-    role?: string,
   ): Promise<{ access_token: string; user: any }> {
     const exists = await this.userRepo.findOne({ where: { email } });
     if (exists) throw new ConflictException('Email already registered');
+    if (!password || password.length < 8)
+      throw new ConflictException('Password must be at least 8 characters');
 
     const hash = await bcrypt.hash(password, 10);
     const user = await this.userRepo.save(
@@ -94,7 +112,7 @@ export class AuthService {
         email,
         name,
         password: hash,
-        role: (role as any) || 'analyst',
+        role: 'analyst',
       }),
     );
 

@@ -35,6 +35,7 @@ cd black-sentinel-nexus-free
 ### Paso 2: Iniciar con Docker
 
 ```bash
+./scripts/init-env.sh      # secreto JWT aleatorio + contraseña del primer admin en .env
 docker-compose up -d
 ```
 
@@ -70,7 +71,7 @@ Abrir el navegador y acceder a:
 | Campo | Valor |
 |-------|-------|
 | Email | admin@blacksentinel.io |
-| Contrasena | Admin@123 |
+| Contrasena | La `ADMIN_PASSWORD` de tu `.env` (`./scripts/init-env.sh`) o la que el API muestra una vez en su log al primer arranque |
 
 ---
 

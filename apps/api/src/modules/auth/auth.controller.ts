@@ -28,15 +28,9 @@ export class AuthController {
       email: string;
       name: string;
       password: string;
-      role?: string;
     },
   ) {
-    return this.authService.register(
-      body.email,
-      body.name,
-      body.password,
-      body.role,
-    );
+    return this.authService.register(body.email, body.name, body.password);
   }
 
   @Get('profile')

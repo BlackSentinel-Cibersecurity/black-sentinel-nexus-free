@@ -7,10 +7,12 @@ import {
   Body,
   Param,
   UseGuards,
+  Request,
+  ForbiddenException,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { UsersService } from './users.service';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { AdminGuard, JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @ApiTags('users')
 @Controller('users')
@@ -38,6 +40,7 @@ export class UsersController {
   }
 
   @Post()
+  @UseGuards(AdminGuard)
   @ApiOperation({ summary: 'Create a new user' })
   async create(
     @Body()
@@ -52,6 +55,7 @@ export class UsersController {
   }
 
   @Patch(':id')
+  @UseGuards(AdminGuard)
   @ApiOperation({ summary: 'Update a user' })
   async update(
     @Param('id') id: string,
@@ -66,7 +70,11 @@ export class UsersController {
   async changePassword(
     @Param('id') id: string,
     @Body() body: { currentPassword: string; newPassword: string },
+    @Request() req: any,
   ) {
+    if (req.user?.id !== id && req.user?.role !== 'admin') {
+      throw new ForbiddenException('You can only change your own password');
+    }
     await this.usersService.changePassword(
       id,
       body.currentPassword,
@@ -76,6 +84,7 @@ export class UsersController {
   }
 
   @Patch(':id/reset-password')
+  @UseGuards(AdminGuard)
   @ApiOperation({ summary: 'Reset user password (admin)' })
   async resetPassword(
     @Param('id') id: string,
@@ -86,6 +95,7 @@ export class UsersController {
   }
 
   @Delete(':id')
+  @UseGuards(AdminGuard)
   @ApiOperation({ summary: 'Delete a user' })
   async remove(@Param('id') id: string) {
     await this.usersService.remove(id);

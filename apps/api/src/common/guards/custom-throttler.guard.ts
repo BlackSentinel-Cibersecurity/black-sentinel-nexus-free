@@ -1,5 +1,5 @@
 import { Injectable, ExecutionContext } from '@nestjs/common';
-import { ThrottlerGuard } from '@nestjs/throttler';
+import { ThrottlerException, ThrottlerGuard } from '@nestjs/throttler';
 
 @Injectable()
 export class CustomThrottlerGuard extends ThrottlerGuard {
@@ -8,18 +8,13 @@ export class CustomThrottlerGuard extends ThrottlerGuard {
   }
 
   protected throwThrottlingException(): Promise<void> {
-    throw new Error('Demasiadas solicitudes. Intenta de nuevo en un minuto.');
+    // A plain Error surfaced as a 500; this answers 429 Too Many Requests.
+    throw new ThrottlerException('Too many requests. Try again in a minute.');
   }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const request = context.switchToHttp().getRequest();
-    const url = request.url;
-
-    // Excluir rutas de autenticación del rate limiting
-    if (url.includes('/auth/login') || url.includes('/auth/register')) {
-      return true;
-    }
-
+    // SECURITY FIX: /auth/login and /auth/register used to be exempt, which
+    // left password guessing unlimited. They are rate-limited like the rest.
     return super.canActivate(context);
   }
 }

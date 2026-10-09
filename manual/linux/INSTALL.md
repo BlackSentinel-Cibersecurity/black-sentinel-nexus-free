@@ -106,7 +106,7 @@ Abrir el navegador (Firefox, Chrome, etc.) y acceder a:
 | Campo | Valor |
 |-------|-------|
 | Email | admin@blacksentinel.io |
-| Contrasena | Admin@123 |
+| Contrasena | La `ADMIN_PASSWORD` de tu `.env` (`./scripts/init-env.sh`) o la que el API muestra una vez en su log al primer arranque |
 
 ---
 

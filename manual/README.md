@@ -69,7 +69,7 @@ pnpm start
 **Listo!** El sistema estara disponible en:
 - Web: http://localhost:3000
 - API: http://localhost:3001
-- Login: admin@blacksentinel.io / Admin@123
+- Login: admin@blacksentinel.io / la contraseña que el API muestra una vez en su log al primer arranque (o tu `ADMIN_PASSWORD`)
 
 ---
 
@@ -127,7 +127,7 @@ black-sentinel-nexus-free/
 | Campo | Valor |
 |-------|-------|
 | Email | admin@blacksentinel.io |
-| Contrasena | Admin@123 |
+| Contrasena | La `ADMIN_PASSWORD` de tu `.env` (`./scripts/init-env.sh`) o la que el API muestra una vez en su log al primer arranque |
 
 **IMPORTANTE:** Cambia la contrasena despues del primer inicio.
 
