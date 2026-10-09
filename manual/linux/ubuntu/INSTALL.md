@@ -68,7 +68,7 @@ Abrir Firefox o Chrome y acceder a:
 | API | http://localhost:3001 |
 | Docs | http://localhost:3001/docs |
 
-**Login:** admin@blacksentinel.io / Admin@123
+**Login:** admin@blacksentinel.io / la contraseña que el API muestra una vez en su log al primer arranque (o tu `ADMIN_PASSWORD`)
 
 ---
 

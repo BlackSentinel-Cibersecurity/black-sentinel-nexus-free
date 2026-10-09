@@ -14,7 +14,10 @@ services:
       - PORT=3001
       - DATABASE_TYPE=sqlite
       - DATABASE_PATH=/app/data/black_sentinel.db
-      - JWT_SECRET=${JWT_SECRET:-change-this-to-a-secure-random-string}
+      # From .env (run scripts/init-env.sh). Left empty, the API uses a random
+      # JWT secret per run and prints a random first-admin password in its log.
+      - JWT_SECRET=${JWT_SECRET:-}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-}
       - JWT_EXPIRES_IN=24h
       - CORS_ORIGIN=http://localhost:3000
     volumes:
